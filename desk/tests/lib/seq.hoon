@@ -574,16 +574,48 @@
     !>  (get-tail ~[1 2])
 
 ::  +group-by
-
+++  test-group-by-00
+  %+  expect-eq
+    !>  ~
+    !>  (group-by `(list @)`~ |=(a=@ (mod a 2)))
+++  test-group-by-01
+  %+  expect-eq
+    !>  ~[[p=1 q=[i=1 t=~]]]
+    !>  (group-by `(list @)`~[1] |=(a=@ (mod a 2)))
+++  test-group-by-example-00
+  %+  expect-eq
+    !>  ~[[p=0 q=[i=4 t=~[[2 0]]]] [p=1 q=[i=5 t=~[[3 [1 0] 0]]]]]
+    !>  (group-by (gulf 1 5) |=(a=@ (mod a 2)))
 ::  +indexed
+++  test-indexed-00
+  %+  expect-eq
+    !>  ~
+    !>  (indexed `(list @)`~)
+++  test-indexed-01
+  %+  expect-eq
+    !>  ~[[0 1]]
+    !>  (indexed (limo ~[1]))
+++  test-indexed-example-00
+  %+  expect-eq
+    !>  ~[[0 1] [1 2] [2 3]]
+    !>  (indexed (gulf 1 3))
 ::  +init
-::
-
+++  test-init-00
+  %+  expect-eq
+    !>  ~[6]
+    !>  (init 1 |=(a=@ (add a 5)))
+++  test-init-fail-00
+  %-  expect-fail
+  |.  (init 0 |=(a=@ (add a 5)))
+++  test-init-example-00
+  %+  expect-eq
+    !>  ~[6 7 8]
+    !>  (init 3 |=(a=@ (add a 5)))
 ::  +insert-at
-::++  test-insert-at-00        :: fails  to do: report into?
-::  %+  expect-eq
-::    !>  ~[1]
-::    !>  (insert-at (limo ~) 0 1)
+++  test-insert-at-00
+  %+  expect-eq
+    !>  ~[1]
+    !>  (insert-at `(list @)`~ 0 1)
 ++  test-insert-at-01
   %+  expect-eq
     !>  ~[2 1]
@@ -609,9 +641,30 @@
   %+  expect-eq
     !>  [i=2 t=~[11 3 4]]
     !>  (insert-at (limo ~[2 3 4]) 1 11)
-::
 ::  +insert-many-at
-
+++  test-insert-many-at-00
+  %+  expect-eq
+    !>  ~
+    !>  (insert-many-at `(list @)`~ `(list @)`~ 0)
+++  test-insert-many-at-01
+  %+  expect-eq
+    !>  ~[3 4]
+    !>  (insert-many-at `(list @)`~ (limo ~[3 4]) 0)
+++  test-insert-many-at-02
+  %+  expect-eq
+    !>  ~[1 2]
+    !>  (insert-many-at (limo ~[1 2]) `(list @)`~ 1)
+++  test-insert-many-at-03
+  %+  expect-eq
+    !>  ~[1 2 3 4]
+    !>  (insert-many-at (limo ~[1 2]) (limo ~[3 4]) 2)
+++  test-insert-many-at-fail-00
+  %-  expect-fail
+  |.  (insert-many-at (limo ~[1 2]) (limo ~[3 4]) 3)
+++  test-insert-many-at-example-00
+  %+  expect-eq
+    !>  ~[1 2 3 4 5 6 7]
+    !>  (insert-many-at (limo ~[1 2 5 6 7]) (limo ~[3 4]) 2)
 ::  +is-empty
 ++  test-is-empty-example-00
   %+  expect-eq
@@ -621,8 +674,31 @@
   %+  expect-eq
     !>  %.y
     !>  (is-empty `(list @)`~)
-
 ::  +item
+++  test-item-00
+  %+  expect-eq
+    !>  "aa"
+    !>  (item `(list tape)`~["aa"] 0)
+++  test-item-01
+  %+  expect-eq
+    !>  "aa"
+    !>  (item `(list tape)`~["aa" "bb"] 0)
+++  test-item-02
+  %+  expect-eq
+    !>  "bb"
+    !>  (item `(list tape)`~["aa" "bb"] 1)
+++  test-item-fail-00
+  %-  expect-fail
+  |.  (item `(list tape)`~ 0)
+++  test-item-fail-01
+  %-  expect-fail
+  |.  (item `(list tape)`~["aa" "bb"] 2)
+++  test-item-example-00
+  %+  expect-eq
+    !>  "cc"
+    !>  (item `(list tape)`~["aa" "bb" "cc" "dd"] 2)
+
+
 ::  +iter
 ::  +iter2
 ::  +iteri
@@ -724,8 +800,34 @@
 ::  +pick
 ::  +reduce
 ::  +reduce-back
+
 ::  +remove-at
-::
+++  test-remove-at-00
+  %+  expect-eq
+    !>  ~
+    !>  (remove-at (limo ~[1]) 0)
+++  test-remove-at-01
+  %+  expect-eq
+    !>  ~[2]
+    !>  (remove-at `(list @)`[1 2 ~] 0)
+++  test-remove-at-02
+   %+  expect-eq
+    !>  ~[1]
+    !>  (remove-at `(list @)`[1 2 ~] 1)
+++  test-remove-at-fail-00
+  %-  expect-fail
+  |.  (remove-at ~ 0)
+++  test-remove-at-fail-01
+  %-  expect-fail
+  |.  (remove-at (limo ~[1]) 1)
+++  test-remove-at-example-00
+  %+  expect-eq
+    !>  "good day urbit!"
+    !>  (remove-at "good day, urbit!" 8)
+++  test-remove-at-example-01
+  %+  expect-eq
+    !>  ~[1 2 4]
+    !>  (remove-at `(list @)`[1 2 3 4 ~] 2)
 ::  +remove-many-at
 ++  test-remove-many-at-00
   %+  expect-eq
@@ -1008,7 +1110,29 @@
 ::  +sort-by-descending
 ::  +sort-descending
 ::  +sort-with
+
 ::  +split-at
+++  test-split-at-00
+  %+  expect-eq
+    !>  [~ ~]
+    !>  (split-at `(list)`~ 0)
+++  test-split-at-01
+  %+  expect-eq
+    !>  [~ ~[1]]
+    !>  (split-at (limo ~[1]) 0)
+    ++  test-split-at-02
+  %+  expect-eq
+    !>  [~[1] ~]
+    !>  (split-at (limo ~[1]) 1)
+    ++  test-split-at-03
+  %+  expect-eq
+    !>  [~[1] ~[2]]
+    !>  (split-at (limo ~[1 2]) 1)
+++  test-split-at-example-00
+  %+  expect-eq
+    !>  [~[1 2] ~[3 4 5]]
+    !>  (split-at (limo ~[1 2 3 4 5]) 2)
+
 ::  +split-into
 ::  +sum
 ::  +sum-by
