@@ -748,23 +748,23 @@
     !>  5
     !>  (length [1 'a' 2 'b' (some 10) ~])
 ::
-::  +map-items
-++  test-map-items-00
+::  +map-seq
+++  test-map-seq-00
   %+  expect-eq
     !>  ~
-    !>  (map-items ~ @t)
-++  test-map-items-elements-01
+    !>  (map-seq ~ @t)
+++  test-map-seq-elements-01
   %+  expect-eq
     !>  ~['h']
-    !>  (map-items ~[104] @t)
-++  test-map-items-example-00
+    !>  (map-seq ~[104] @t)
+++  test-map-seq-example-00
   %+  expect-eq
     !>  "hoon"
-    !>  (map-items (limo [104 111 111 110 ~]) @t)
-++  test-map-items-example-01
+    !>  (map-seq (limo [104 111 111 110 ~]) @t)
+++  test-map-seq-example-01
   %+  expect-eq
     !>  ~[5 6 7 8]
-    !>  (map-items (limo [1 2 3 4 ~]) |=(a=@ (add a 4)))
+    !>  (map-seq (limo [1 2 3 4 ~]) |=(a=@ (add a 4)))
 ::
 ::  +map2
 ::  +map3
@@ -1103,7 +1103,33 @@
   %+  expect-eq
     !>  ~["tape"]
     !>  (singleton "tape")
-::  +skip
+::  +skip-n
+++  test-skip-n-00
+  %+  expect-eq
+    !>  ~
+    !>  (skip-n `(list @)`~ 0)
+++  test-skip-n-01
+  %+  expect-eq
+    !>  ~[1]
+    !>  (skip-n `(list @)`~[1] 0)
+++  test-skip-n-02
+  %+  expect-eq
+    !>  ~
+    !>  (skip-n `(list @)`~[1] 1)
+++  test-skip-n-03
+  %+  expect-eq
+    !>  ~[2]
+    !>  (skip-n `(list @)`~[1 2] 1)
+++  test-skip-n-fail-00
+  %-  expect-fail
+  |.  (skip-n `(list @)`~ 1)
+++  test-skip-n-fail-01
+  %-  expect-fail
+  |.  (skip-n `(list @)`~[1] 2)
+++  test-skip-n-example-00
+  %+  expect-eq
+    !>  ~[3 4]
+    !>  (skip-n `(list @)`[1 2 3 4 ~] 2)
 ::  +skip-while
 ::  +sort
 ::  +sort-by

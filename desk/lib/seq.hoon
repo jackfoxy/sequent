@@ -655,7 +655,7 @@
   |-
   ?:  =(0 len)  a
   $(len (dec len), a [(ini len) a])
-::    +insert-at: [(list) index:@ value:*] -> (list)
+::    +insert-at: [(list 'T) index:@ value:'T] -> (list 'T)
 ::
 ::  Return a new list with a new item inserted before the given index.
 ::    Source
@@ -668,7 +668,7 @@
 ::    > (insert-at (limo ~[2 3 4]) 1 11)
 ::    ~[2 11 3 4]
 ++  insert-at  into
-::    +insertManyAt: [(list) values=(list) index=@] -> (list)
+::    +insertManyAt: [(list 'T) values=(list 'T) index=@] -> (list 'T)
 ::
 ::  Return a new list with new items inserted before the given index.
 ::    Source
@@ -722,7 +722,7 @@
 ++  item
   |*  [a=(list) i=@]
   (snag i a)
-::    +last-n: [(list *) count:@ud] -> (list *)
+::    +last-n: [(list  'T) count:@] -> (list  'T)
 ::
 ::  Returns the last N elements of the list.
 ::    Source
@@ -737,7 +737,7 @@
 ++  last-n
   |*  [p=(list) q=@]
   (flop (scag q (flop p)))
-::    +length: (list *) -> @ud
+::    +length: (list  'T) -> @u
 ::
 ::  Returns the length of the list.
 ::    Source
@@ -755,7 +755,7 @@
 ::      > (length [1 'a' 2 'b' (some 10) ~])
 ::      5
 ++  length  lent
-::    +map-items: [(list) mapping:$-(* *)] -> (list)
+::    +map-seq: [(list 'T1) mapping:$-('T1 'T2)] -> (list 'T2)
 ::
 ::  Builds a new list whose elements are the results of applying the given
 ::  gate to each of the elements of the list.
@@ -774,10 +774,10 @@
 ::      > =a |=(a=@ (add a 4))
 ::      > (map (limo [1 2 3 4 ~]) a)
 ::      ~[5 6 7 8]
-++  map-items  turn
+++  map-seq  turn
 ::
 
-::    +map2: [(list1) (list2) mapping
+::    +map2: [(list 'T1) (list 'T1) mapping
 ::
 ::  Builds a new collection whose elements are the results of applying the given
 ::  function to the corresponding elements of the two collections pairwise.
@@ -786,7 +786,7 @@
 ++  map2  !!
 ::
 
-::    +map3: [(list) (list) (list) mapping
+::    +map3: [(list 'T1) (list 'T2) (list 'T3) mapping
 ::
 ::  Builds a new collection whose elements are the results of applying the given
 ::  function to the corresponding elements of the three collections
@@ -796,7 +796,7 @@
 ++  map3  !!
 ::
 
-::    +map-fold: [(list) state mapping
+::    +map-fold: [(list 'T) state mapping
 ::
 ::  Combines map and fold. Builds a new list whose elements are the results of
 ::  applying the given function to each of the elements of the input list. The
@@ -806,7 +806,7 @@
 ++  map-fold  !!
 ::
 
-::    +map-fold-back: [(list) state mapping
+::    +map-fold-back: [(list 'T) state mapping
 ::
 ::  Combines map and foldBack. Builds a new list whose elements are the results
 ::  of applying the given function to each of the elements of the input list.
@@ -816,7 +816,7 @@
 ++  map-fold-back  !!
 ::
 
-::    +mapi: [(list) mapping
+::    +mapi: [(list 'T) mapping
 ::
 ::  Builds a new collection whose elements are the results of applying the given
 ::  function to each of the elements of the collection. The integer index passed
@@ -826,7 +826,7 @@
 ++  mapi  !!
 ::
 
-::    +mapi2: [(list) (list) mapping 
+::    +mapi2: [(list 'T1) (list 'T2) mapping 
 ::
 ::  Like mapi, but mapping corresponding elements from two lists of equal length.
 ::    Source
@@ -834,7 +834,7 @@
 ++  mapi2  !!
 ::
 
-::    +max: (list) -> *
+::    +max: (list @) -> *
 ::
 ::  Return the greatest of all elements of the list, compared via Operators.max.
 ::    Source
@@ -842,7 +842,7 @@
 ++  max  !!
 ::
 
-::    +maxBy: (list) projection
+::    +maxBy: (list 'T) projection
 ::
 ::  Returns the greatest of all elements of the list, compared via Operators.max
 ::  on the function result.
@@ -851,7 +851,7 @@
 ++  max-by  !!
 ::
 
-::    +min: (list) 
+::    +min: (list 'T) 
 ::
 ::  Returns the lowest of all elements of the list, compared via Operators.min.
 ::    Source
@@ -859,7 +859,7 @@
 ++  min  !!
 ::
 
-::    +minBy: (list) projection
+::    +minBy: (list 'T) projection
 ::
 ::  Returns the lowest of all elements of the list, compared via Operators.min
 ::  on the function result
@@ -877,7 +877,7 @@
 ++  pairwise  !!
 ::
 
-::    +partition: [(list) predicate:$-(* ?)] -> [(list) (list)]
+::    +partition: [(list 'T) predicate:$-( 'T ?)] -> [(list 'T) (list 'T)]
 ::
 ::  Splits the collection into two collections, containing the elements for
 ::  which the given predicate returns True and False respectively. Element order
@@ -906,7 +906,7 @@
 ++  permute  !!
 ::
 
-::    +pick: [(list) chooser
+::    +pick: [(list 'T) chooser
 ::
 ::  Applies the given function to successive elements, returning the first
 ::  result where function returns Some(x) for some x. If no such element exists
@@ -928,7 +928,7 @@
 ++  reduce  !!
 ::
 
-::    +reduceBack: [(list) reduction 
+::    +reduceBack: [(list 'T) reduction 
 ::
 ::  Applies a function to each element of the collection, starting from the end,
 ::  threading an accumulator argument through the computation. If the input
@@ -939,7 +939,7 @@
 ++  reduce-back  !!
 ::
 
-::    +remove-at: [(list) index:@] -> (list)
+::    +remove-at: [(list 'T) index:@] -> (list 'T)
 ::
 ::  Return a new list with the item at a given index removed.
 ::    Source
@@ -952,7 +952,7 @@
   |*  [a=(list) i=@]
   ?:  (gte i (lent a))  ~|("out of range" !!)
   (oust [i 1] a)
-::    +remove-many-at: [(list) index=@ count=@] -> (list)
+::    +remove-many-at: [(list 'T) index=@ count=@] -> (list 'T)
 ::
 ::  Return a new list with the number of items starting at a given index removed
 ::    Source
@@ -967,7 +967,7 @@
 ++  remove-many-at
   |*  [a=(list) b=@ c=@]
   (oust [b c] a)
-::    +replicate: [count=@ initial=*] -> (list *)
+::    +replicate: [count=@ initial='T] -> (list 'T)
 ::
 ::  Creates a list by replicating the given initial value.
 ::    Source
@@ -985,7 +985,7 @@
 ::      > `@dr`(roll (replicate 5 ~s1) add)
 ::      ~s5
 ++  replicate  reap
-::    +reverse: (list) -> (list)
+::    +reverse: (list 'T) -> (list 'T)
 ::
 ::  Returns a new list with the elements in reverse order.
 ::    Source
@@ -1005,7 +1005,7 @@
 ::      > (flop (flop a))
 ::      ~[1 2 3]
 ++  reverse  flop
-::    +scan: [(list) state folder
+::    +scan: [(list 'T) state folder
 ::
 ::  Applies a function to each element of the collection, threading an
 ::  accumulator argument through the computation. Take the second argument, and
@@ -1017,7 +1017,7 @@
 ++  scan  !!
 ::
 
-::    +scan-back: [(list) state folder
+::    +scan-back: [(list 'T) state folder
 ::
 ::  Like fold-back, but returns both the intermediary and final results
 ::    Source
@@ -1025,7 +1025,7 @@
 ++  scan-back  !!
 
 ::
-::    +search: [(list) predicate:$-(* ?)] -> *
+::    +search: [(list 'T) predicate:$-('T ?)] -> 'T
 ::
 ::  Returns the first element for which the given function returns True. 
 ::  Crashes if no such element exists.
@@ -1043,7 +1043,7 @@
   |-  ^-  _?>(?=(^ a) i.a)
   ?~  a  ~|("not found" !!)
   ?:  (b i.a)  i.a  $(a t.a)
-::    +search-all: [(list) predicate:$-(* ?)] -> (list))
+::    +search-all: [(list 'T) predicate:$-('T ?)] -> (list 'T))
 ::
 ::  Returns all elements for which the given function returns True. 
 ::  Crashes if no such element exists.
@@ -1063,7 +1063,7 @@
   |-
   ?~  a  ?~  c  ~|("not found" !!)  (flop c)
   ?:  (b i.a)  $(a t.a, c [i.a c])  $(a t.a)
-::    +search-all-by-list: [(list) arg:(list) -> (list @)]
+::    +search-all-by-list: [(list 'T) arg:(list 'T) -> (list @)]
 ::
 ::  Produces list of indices of all occurrences of the argument list sequence in
 ::  the sequence of the source list.
@@ -1079,7 +1079,7 @@
   |*  [hstk=(list) nedl=(list)]
   ^-  (list @)
   (fand nedl hstk)
-::    +search-back: [(list) predicate:$-(* ?)] -> *
+::    +search-back: [(list 'T) predicate:$-('T ?)] -> 'T
 ::
 ::  Returns the last element for which the given function returns True. 
 ::  Crashes if no such element exists.
@@ -1095,7 +1095,7 @@
   |*  [a=(list) b=$-(* ?)]
   ?~  a  ~|("not found" !!)
   (search (flop a) b)
-::    +search-back-by-list: [(list) arg:(list)] -> @ud
+::    +search-back-by-list: [(list 'T) arg:(list 'T)] -> @
 ::
 ::  Produces the index of the last occurrence of the argument list sequence in
 ::  the sequence of the source list.
@@ -1109,7 +1109,7 @@
 ++  search-back-by-list
   |*  [hstk=(list) nedl=(list)]
   (tail-end (search-all-by-list hstk nedl))
-::    +search-by-list: [(list) arg:(list)] -> @ud
+::    +search-by-list: [(list 'T) arg:(list 'T)] -> @
 ::
 ::  Produces the index of the first occurrence of the argument list sequence in
 ::  the sequence of the source list.
@@ -1127,7 +1127,7 @@
   ^-  @
   =/  x  (find nedl hstk)
   ?~  x  ~|("not found" !!)  (need x)
-::    +search-index: [(list) predicate:$-(* ?)] -> @ud
+::    +search-index: [(list 'T) predicate:$-('T ?)] -> @
 ::
 ::  Returns the index of the first element in the list that satisfies the given
 ::  predicate. Crashes if no such element exists.
@@ -1147,7 +1147,7 @@
   |-  ^-  @
   ?~  a  ~|("not found" !!)
   ?:  (b i.a)  i  $(a t.a, i +(i))
-::    +search-index-all: [(list) predicate:$-(* ?)] -> (list @)
+::    +search-index-all: [(list 'T) predicate:$-('T ?)] -> (list @)
 ::
 ::  Returns the list of indices in the list that satisfies the given predicate.
 ::    Source
@@ -1168,7 +1168,7 @@
   |-  ^-  (list @)
   ?~  a  (flop c)
   ?:  (b i.a)  $(a t.a, c [i c], i +(i))  $(a t.a, i +(i))
-::    +search-index-back: [(list) predicate:$-(* ?)] -> @ud
+::    +search-index-back: [(list 'T) predicate:$-('T ?)] -> @
 ::
 ::  Returns the index of the last element in the list that satisfies the given
 ::  predicate. Crashes if no such element exists.
@@ -1194,7 +1194,7 @@
   ?:  (c i.b)  i  
   ?:  =(0 i)  ~|("not found" !!)
   $(b t.b, i (dec i))
-::    +singleton: value: * -> (list)
+::    +singleton: value: 'T -> (list 'T)
 ::
 ::  Returns a list that contains one item only.
 ::    Source
@@ -1206,15 +1206,21 @@
   (limo ~[a])
 ::
 
-::    +skip-n: [(list) count:@] -> (list)
+::    +skip-n: [(list 'T) count:@] -> (list 'T)
 ::
 ::  Returns the list after removing the first N elements.
 ::    Source
 ::    Examples
-++  skip-n  !!
+::      > (skip-n `(list @)`[1 2 3 4 ~] 2)
+::      ~[3 4]
+++  skip-n
+  |*  [p=(list) q=@]
+  ?~  p  ?~  q  p  ~|("out of range" !!)
+  ?~  q  p
+  $(p t.p, q (dec q))
 ::
 
-::    +skip-while: [(list) predicate:$-(* ?)] -> (list)
+::    +skip-while: [(list 'T) predicate:$-('T ?)] -> (list 'T)
 ::
 ::  Bypasses elements in a list while the given predicate returns True, and then
 ::  returns the remaining elements of the list.
@@ -1223,7 +1229,7 @@
 ++  skip-while  !!
 ::
 
-::    +sort: (list) -> (list)
+::    +sort: (list 'T) -> (list 'T)
 ::
 ::  Sorts the given list using Operators.compare.
 ::    Source
@@ -1231,7 +1237,7 @@
 ++  sort  !!
 ::
 
-::    +sort-by: [(list) projection:] -> (list)
+::    +sort-by: [(list 'T) projection:] -> (list 'T)
 ::
 ::  Sorts the given list using keys given by the given projection. Keys are
 ::  compared using Operators.compare.
@@ -1240,7 +1246,7 @@
 ++  sort-by  !!
 ::
 
-::    +sort-by-descending: [(list) projection:] -> (list)
+::    +sort-by-descending: [(list 'T) projection:] -> (list 'T)
 ::
 ::  Sorts the given list in descending order using keys given by the given
 ::  projection. Keys are compared using Operators.compare.
@@ -1249,7 +1255,7 @@
 ++  sort-by-descending  !!
 ::
 
-::    +sort-descending: (list) -> (list)
+::    +sort-descending: (list 'T) -> (list 'T)
 ::
 ::  Sorts the given list in descending order using Operators.compare.
 ::    Source
@@ -1257,7 +1263,7 @@
 ++  sort-descending  !!
 ::
 
-::    +sort-with: [(list) comparer:] -> (list)
+::    +sort-with: [(list 'T) comparer:] -> (list 'T)
 ::
 ::  Sorts the given list using the given comparison function.
 ::    Source
@@ -1265,7 +1271,7 @@
 ++  sort-with  !!
 ::
 
-::    +split-at: [(list) index:@] -> [(list) (list)]
+::    +split-at: [(list 'T) index:@] -> [(list 'T) (list 'T)]
 ::
 ::  Splits a list into two lists, at the given index.
 ::    Source
@@ -1275,7 +1281,7 @@
   [(scag i p) (slag i p)]
 ::
 
-::    +split-into: [(list) count:@] -> (list (list))
+::    +split-into: [(list 'T) count:@] -> (list (list 'T))
 ::
 ::  Splits the input list into at most count chunks.
 ::    Source
@@ -1293,7 +1299,7 @@
 ++  sum  !!
 ::
 
-::    +sum-by: [(list @) projection 
+::    +sum-by: [(list 'T) projection 
 ::
 ::  Returns the sum of the results generated by applying the function to each
 ::  element of the list.
@@ -1302,7 +1308,7 @@
 ++  sum-by  !!
 ::
 
-::    +tail-end: (list) -> *
+::    +tail-end: (list 'T) -> 'T
 ::
 ::  Returns the last element of the list.
 ::    ArgumentException:  Crash when the input does not have any elements.
@@ -1320,7 +1326,7 @@
   |*  a=(list)
   ?~  a  ~|("not found" !!)
   (rear a)
-::    +take-while: [(list) predicate:$-(* ?)] -> (list)
+::    +take-while: [(list 'T) predicate:$-('T ?)] -> (list 'T)
 ::
 ::  Returns a list that contains all elements of the original list while the
 ::  given predicate returns True, and then returns no further elements.
@@ -1337,7 +1343,7 @@
 ++  transpose  !!
 ::
 
-::    +try-exactly-one: (list) -> (unit *)
+::    +try-exactly-one: (list 'T) -> (unit 'T)
 ::
 ::  Returns the only element of the list or None if it is empty or contains more
 ::  than one element.
@@ -1353,7 +1359,7 @@
   |*  a=(list)
   ?:  =(1 (lent a))  `-.a
   ~
-::    +try-head: (list) -> (unit *)
+::    +try-head: (list 'T) -> (unit 'T)
 ::
 ::  Returns the first element of the list, or None if the list is empty.
 ::    Source
@@ -1369,7 +1375,7 @@
   ?~  a  ~
   `i.a
 
-::    +try-item: [(list) index:@] -> (unit *)
+::    +try-item: [(list 'T) index:@] -> (unit 'T)
 ::
 ::  Tries to find the nth element in the list. Returns None if index is negative
 ::  or the list does not contain enough elements.
@@ -1378,7 +1384,7 @@
 ++  try-item  !!
 ::
 
-::    +try-pick: [(list) chooser:$-(* (unit *))] -> (unit *)
+::    +try-pick: [(list 'T) chooser:$-('T (unit 'T))] -> (unit 'T)
 ::
 ::  Applies the given function to successive elements, returning Some(x) the
 ::  first result where function returns Some(x) for some x.
@@ -1388,7 +1394,7 @@
 ++  try-pick  !!
 ::
 
-::    +try-search: [(list) predicate:$-(* ?)] -> (unit *)
+::    +try-search: [(list 'T) predicate:$-('T ?)] -> (unit 'T)
 ::
 ::  Returns the first element for which the given function returns True.
 ::  Return None if no such element exists.
@@ -1406,7 +1412,7 @@
   |-  ^-  (unit _?>(?=(^ a) i.a))
   ?~  a  ~
   ?:  (b i.a)  `i.a  $(a t.a)
-::    +try-search-back: [(list) predicate:$-(* ?)] -> (unit *)
+::    +try-search-back: [(list 'T) predicate:$-('T ?)] -> (unit 'T)
 ::
 ::  Returns the last element for which the given function returns True.
 ::  Return None if no such element exists.
@@ -1422,7 +1428,7 @@
   |*  [a=(list) b=$-(* ?)]
   ?~  a  ~
   (try-search (flop a) b)
-::    +try-search-index: [(list) predicate:$-(* ?)] -> (unit @)
+::    +try-search-index: [(list 'T) predicate:$-('T ?)] -> (unit @)
 ::
 ::  Returns the index of the first element in the list that satisfies the given
 ::  predicate. Return None if no such element exists.
@@ -1442,7 +1448,7 @@
   |-  ^-  (unit @)
   ?~  a  ~
   ?:  (b i.a)  `i  $(a t.a, i +(i))
-::    +try-search-index-back: [(list) predicate:$-(* ?)] -> (unit @ud)
+::    +try-search-index-back: [(list 'T) predicate:$-('T ?)] -> (unit @)
 ::
 ::  Returns the index of the last element in the list that satisfies the given
 ::  predicate. Return None if no such element exists.
@@ -1458,7 +1464,7 @@
   ?:  (c i.b)  `i  
   ?:  =(0 i)  ~
   $(b t.b, i (dec i))
-::    +try-tail: (list) -> (unit (list))
+::    +try-tail: (list 'T) -> (unit (list 'T))
 ::
 ::  Returns the elements of the list after the first, or None if the list is empty.
 ::    Source
@@ -1473,7 +1479,7 @@
   |*  a=(list)
   ?~  a  ~
   `t.a
-::    +try-tail-end: (list) -> (unit *)
+::    +try-tail-end: (list 'T) -> (unit 'T)
 ::
 ::  Returns the last element of the list. Return None if no such element exists.
 ::    Source
@@ -1523,7 +1529,7 @@
   |-  ::^-  [_b _c]
   ?~  a  [(flop b) (flop c)]
   $(a t.a, b [-.i.a b], c [+.i.a c])
-::    +unzip3: list
+::    +unzip3: (list ['T1 'T2 'T3]) - [(list 'T1) (list 'T2) (list 'T3)]
 ::
 ::  Splits a list of triples into three lists.
 ::    Source
@@ -1547,7 +1553,7 @@
 ++  update-at  !!
 ::
 
-::    +where: [(list) predicate:$-(* ?)] -> (list)
+::    +where: [(list 'T) predicate:$-('T ?)] -> (list 'T)
 ::
 ::  Returns a new list containing only the elements of the list for which the
 ::  given predicate returns "true"
@@ -1571,7 +1577,7 @@
   $(a t.a, b [i.a b])
 ::
 
-::    +windowed: [(list) window-size:@] -> (list)
+::    +windowed: [(list 'T) window-size:@] -> 
 ::
 ::  Returns a list of sliding windows containing elements drawn from the input
 ::  list. Each window is returned as a fresh list.
