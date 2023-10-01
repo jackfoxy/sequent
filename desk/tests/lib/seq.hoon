@@ -765,10 +765,66 @@
   %+  expect-eq
     !>  ~[5 6 7 8]
     !>  (map-seq (limo [1 2 3 4 ~]) |=(a=@ (add a 4)))
-::
 ::  +map2
+++  test-map2-00
+  %+  expect-eq
+    !>  ~
+    !>  (map2 `(list @)`~ `(list @)`~ |=(a=[@ @] (add -.a +.a)))
+++  test-map2-example-01
+  %+  expect-eq
+    !>  ~[6]
+    !>  (map2 (limo ~[1]) (limo ~[5]) |=(a=[@ @] (add -.a +.a)))
+++  test-map2-fail-00
+  %-  expect-fail
+  |.  (map2 (limo ~[1 2 3]) (limo ~[5 6 7 8]) |=(a=[@ @] (add -.a +.a)))
+++  test-map2-fail-01
+  %-  expect-fail
+  |.  (map2 (limo ~[1 2 3 4]) (limo ~[5 6 7]) |=(a=[@ @] (add -.a +.a)))
+++  test-map2-example-00
+  %+  expect-eq
+    !>  ~[6 8 10 12]
+    !>  (map2 (limo ~[1 2 3 4]) (limo ~[5 6 7 8]) |=(a=[@ @] (add -.a +.a)))
 ::  +map3
+++  test-map3-00
+  %+  expect-eq
+    !>  ~
+    !>  (map3 `(list @)`~ `(list @)`~ `(list @)`~ |=(a=[@ @ @] (add (add -.a +<.a) +>.a)))
+++  test-map3-01
+  %+  expect-eq
+    !>  ~[15]
+    !>  (map3 (limo ~[1]) (limo ~[5]) (limo ~[9]) |=(a=[@ @ @] (add (add -.a +<.a) +>.a)))
+++  test-map3-fail-00
+  %-  expect-fail
+  |.  (map3 (limo ~[1 2]) (limo ~[5]) (limo ~[9]) |=(a=[@ @ @] (add (add -.a +<.a) +>.a)))
+++  test-map3-fail-01
+  %-  expect-fail
+  |.  (map3 (limo ~[1]) (limo ~[5 6]) (limo ~[9]) |=(a=[@ @ @] (add (add -.a +<.a) +>.a)))
+++  test-map3-fail-02
+  %-  expect-fail
+  |.  (map3 (limo ~[1]) (limo ~[5]) (limo ~[9 10]) |=(a=[@ @ @] (add (add -.a +<.a) +>.a)))
+++  test-map3-example-00
+  %+  expect-eq
+    !>  ~[15 18 21 24]
+    !>  (map3 (limo ~[1 2 3 4]) (limo ~[5 6 7 8]) (limo ~[9 10 11 12]) |=(a=[@ @ @] (add (add -.a +<.a) +>.a)))
 ::  +map-fold
+++  map-fold-foo
+  |*  [p=[@t @] state=@]
+  ^-  [[@t @] @]
+  ?:  =(-.p 'in')  [['in' (mul +.p 2)] (add state +.p)]
+  [['out' (mul +.p 2)] (mul state +.p)]
+++  test-map-fold-00
+  %+  expect-eq
+    !>  [~ 0]
+    !>  (map-fold `(list [@t @])`~ 0 map-fold-foo)
+++  test-map-fold-01
+  %+  expect-eq
+    !>  [~[['in' 2]] 1]
+    !>  (map-fold `(list [@t @])`~[['in' 1]] 0 map-fold-foo)
+++  test-map-fold-example-00
+  %+  expect-eq
+    !>  [~[['in' 2] ['out' 4] ['in' 6]] 5]
+    !>  (map-fold `(list [@t @])`~[['in' 1] ['out' 2] ['in' 3]] 0 map-fold-foo)
+
 ::  +map-fold-back
 ::  +mapi
 ::  +mapi2
