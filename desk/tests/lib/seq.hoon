@@ -869,11 +869,62 @@
   %+  expect-eq
     !>  ~[5 8 11]
     !>  (mapi2 (limo ~[1 2 3]) (limo ~[4 5 6]) |=([a=@ b=@ c=@] (add (add a b) c)))
-
-::  +max
+::  +maxi
+++  test-maxi-00
+  %+  expect-eq
+    !>  12
+    !>  (maxi (limo ~[12]))
+++  test-maxi-fail-00
+  %-  expect-fail
+  |.  (maxi `(list @)`~)
+++  test-maxi-example-00
+  %+  expect-eq
+    !>  12
+    !>  (maxi (limo ~[10 12 11]))
+++  test-maxi-example-01
+  %+  expect-eq
+    !>  "max"
+    !>  (maxi (limo ~["max" "add" "busy"]))
 ::  +max-by
-::  +min
+++  test-max-by-00
+  %+  expect-eq
+    !>  "aa"
+    !>  (max-by (limo ~["aa"]) |=(a=tape (lent a)))
+++  test-max-by-fail-00
+  %-  expect-fail
+  |.  (max-by `(list tape)`~ |=(a=tape (lent a)))
+++  test-max-by-example-00
+  %+  expect-eq
+    !>  "mmmm"
+    !>  (max-by (limo ~["aa" "mmmm" "zzz"]) |=(a=tape (lent a)))
+::  +mini
+++  test-mini-00
+  %+  expect-eq
+    !>  12
+    !>  (mini (limo ~[12]))
+++  test-mini-fail-00
+  %-  expect-fail
+  |.  (mini `(list @)`~)
+++  test-mini-example-00
+  %+  expect-eq
+    !>  10
+    !>  (mini (limo ~[10 12 11]))
+++  test-mini-example-01
+  %+  expect-eq
+    !>  "add"
+    !>  (mini (limo ~["max" "add" "busy"]))
 ::  +min-by
+++  test-min-by-00
+  %+  expect-eq
+    !>  "aa"
+    !>  (min-by (limo ~["aa"]) |=(a=tape (lent a)))
+++  test-min-by-fail-00
+  %-  expect-fail
+  |.  (min-by `(list tape)`~ |=(a=tape (lent a)))
+++  test-min-by-example-00
+  %+  expect-eq
+    !>  "aa"
+    !>  (min-by (limo ~["aa" "mmmm" "zzz"]) |=(a=tape (lent a)))
 
 ::  +pairwise
 ++  test-pairwise-00
@@ -913,8 +964,24 @@
   %+  expect-eq
     !>  [p=[i=2 t=~[3]] q=[i=0 t=~[1]]]
     !>  (partition `(list @)`[0 1 2 3 ~] |=(a=@ (gth a 1)))
-::
 ::  +permute
+++  test-permute-00
+  %+  expect-eq
+    !>  ~
+    !>  (permute `(list @)`~ |=(i=@ (mod +(i) 4)))
+++  test-permute-01
+  %+  expect-eq
+    !>  ~[4]
+    !>  (permute (limo ~[4]) |=(i=@ (mod +(i) 1)))
+    ++  test-permute-02
+  %+  expect-eq
+    !>  ~[2 4]
+    !>  (permute (limo ~[4 2]) |=(i=@ (mod +(i) 2)))
+++  test-permute-example-00
+  %+  expect-eq
+    !>  ~[4 1 2 3]
+    !>  (permute (limo ~[1 2 3 4]) |=(i=@ (mod +(i) 4)))
+
 ::  +pick
 ::  +reduce
 ::  +reduce-back
@@ -1327,9 +1394,32 @@
   %+  expect-eq
     !>  `1
     !>  (try-head ~[1 2])
-
-
 ::  +try-item
+++  test-try-item-00
+  %+  expect-eq
+    !>  [~ "aa"]
+    !>  (try-item `(list tape)`~["aa"] 0)
+++  test-try-item-01
+  %+  expect-eq
+    !>  [~ "aa"]
+    !>  (try-item `(list tape)`~["aa" "bb"] 0)
+++  test-try-item-02
+  %+  expect-eq
+    !>  [~ "bb"]
+    !>  (try-item `(list tape)`~["aa" "bb"] 1)
+++  test-try-item-03
+  %+  expect-eq
+    !>  ~
+    !>  (try-item `(list tape)`~ 0)
+++  test-try-item-example-00
+  %+  expect-eq
+    !>  [~ "cc"]
+    !>  (try-item `(list tape)`~["aa" "bb" "cc" "dd"] 2)
+++  test-try-item-example-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-item `(list tape)`~["aa" "bb"] 2)
+
 ::  +try-pick
 
 ::  +try-search
@@ -1446,6 +1536,23 @@
   %+  expect-eq
     !>  `3
     !>  (try-tail-end ~[1 2 3])
+::  +try-update-at
+++  test-try-update-at-00
+  %+  expect-eq
+    !>  [~ ~[11]]
+    !>  (try-update-at (limo ~[1]) 0 11)
+++  test-try-update-at-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-update-at `(list @)`~ 0 11)
+++  test-try-update-at-example-00
+  %+  expect-eq
+    !>  [~ ~[2 11 4]]
+    !>  (try-update-at (limo ~[2 3 4]) 1 11)
+++  test-try-update-at-example-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-update-at (limo ~[2 3 4]) 3 11)
 
 ::  +unfold
 
@@ -1475,9 +1582,21 @@
   %+  expect-eq
     !>  [~[1 2] ~["aa" "bb"] ~['a' 'b']]
     !>  (unzip3 (limo ~[[1 "aa" 'a'] [2 "bb" 'b']]))
-
 ::  +update-at
-
+++  test-update-at-00
+  %+  expect-eq
+    !>  ~[11]
+    !>  (update-at (limo ~[1]) 0 11)
+++  test-update-at-fail-00
+  %-  expect-fail
+  |.  (update-at `(list @)`~ 0 11)
+++  test-update-at-fail-01
+  %-  expect-fail
+  |.  (update-at (limo ~[2 3 4]) 3 11)
+++  test-update-at-example-00
+  %+  expect-eq
+    !>  ~[2 11 4]
+    !>  (update-at (limo ~[2 3 4]) 1 11)
 ::  +where
 ++  test-where-00
   %+  expect-eq
@@ -1495,9 +1614,28 @@
   %+  expect-eq
     !>  ~[2 8]
     !>  (where (limo ~[2 1 8]) |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
-
 ::  +windowed
-
+++  test-windowed-00
+  %+  expect-eq
+    !>  ~[~[1]]
+    !>  (windowed (limo ~[1]) 1)
+++  test-windowed-01
+  %+  expect-eq
+    !>  ~[~[1] ~[2]]
+    !>  (windowed (limo ~[1 2]) 1)
+++  test-windowed-fail-00
+  %-  expect-fail
+  |.  (windowed `(list @)`~ 3)
+++  test-windowed-fail-01
+  %-  expect-fail
+  |.  (windowed (limo ~[1]) 3)
+++  test-windowed-fail-02
+  %-  expect-fail
+  |.  (windowed (limo ~[1 2]) 3)
+++  test-windowed-example-00
+  %+  expect-eq
+    !>  ~[~[1 2 3] ~[2 3 4] ~[3 4 5]]
+    !>  (windowed (limo ~[1 2 3 4 5]) 3)
 ::  +zip
 ++  test-zip-00
   %+  expect-eq

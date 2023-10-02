@@ -656,50 +656,79 @@
   ?~  a  ?~  b  (flop c)  ~|('lists of unequal length' !!)
   ?~  b  ~|('lists of unequal length' !!)
   $(a t.a, b t.b, c [(fun i i.a i.b) c], i +(i))
-::    +max: (list T) -> T
+::    +maxi: (list T) -> T
 ::
 ::  Return the greatest of all elements of the list, compared via Operators.max.
 ::    Examples
-::      > (max (limo ~[10 12 11]))
+::      > (maxi (limo ~[10 12 11]))
 ::      12
+::      > (maxi (limo ~["max" "add" "busy"]))
 ::    Crash
 ::      'empty list'
 ::    Source
-++  max
+++  maxi
   |*  a=(list)
-  ?~  a  ~|('empty list' !!)
-  =/  m  i.a
+  ~|  'empty list'
+  =/  m  -.a
   |-
   ?~  a  m
-  ?:  (lth m i.a)  $(m i.a, a t.a)
+  ?:  (aor m i.a)  $(m i.a, a t.a)
   $(a t.a)
-::
-
-::    +maxBy: (list T) projection
+::    +maxBy: [(list T) projection:$-(* *)] -> T
 ::
 ::  Returns the greatest of all elements of the list, compared via Operators.max
 ::  on the function result.
 ::    Examples
+::      > (max-by (limo ~["aa" "mmmm" "zzz"]) |=(a=tape (lent a)))
+::      "mmmm"
+::    Crash
+::      'empty list'
 ::    Source
-++  max-by  !!
-::
-
-::    +min: (list T) 
+++  max-by
+  |*  [a=(list) q=$-(* *)]
+  ~|  'empty list'
+  =/  m  -.a
+  |-
+  ?~  a  m
+  ?:  (aor (q m) (q i.a))  $(m i.a, a t.a)
+  $(a t.a)
+::    +mini: (list T) 
 ::
 ::  Returns the lowest of all elements of the list, compared via Operators.min.
 ::    Examples
+::      > (mini (limo ~[11 12 10]))
+::      10
+::      > (mini (limo ~["min" "add" "busy"]))
+::      "add"
+::    Crash
+::      'empty list'
 ::    Source
-++  min  !!
-::
-
+++  mini
+  |*  a=(list)
+  ~|  'empty list'
+  =/  m  -.a
+  |-
+  ?~  a  m
+  ?.  (aor m i.a)  $(m i.a, a t.a)
+  $(a t.a)
 ::    +minBy: (list T) projection
 ::
 ::  Returns the lowest of all elements of the list, compared via Operators.min
 ::  on the function result
 ::    Examples
+::      > (min-by (limo ~["aa" "mmmm" "zzz"]) |=(a=tape (lent a)))
+::      "aa"
+::    Crash
+::      'empty list'
 ::    Source
-++  min-by  !!
-
+++  min-by
+  |*  [a=(list) q=$-(* *)]
+  ~|  'empty list'
+  =/  m  -.a
+  |-
+  ?~  a  m
+  ?.  (aor (q m) (q i.a))  $(m i.a, a t.a)
+  $(a t.a)
 ::    +pairwise: (list T) -> (list [T T]) 
 ::
 ::  Returns a list of each element in the input list and its predecessor, with
@@ -728,25 +757,29 @@
 ::      [p=[i=2 t=~[3]] q=[i=0 t=~[1]]]
 ::    Source
 ++  partition  skid
+::    +permute: [(list T) projection:$-(@ @)] -> (list T)
 ::
-
-::    +permute: list
-::
-::  Returns a list with all elements permuted according to the specified 
-::  permutation.
+::  Returns a list with all elements permuted according to the permutation
+::  specified by operating on the element indices.
 ::    Examples
+::      > (permute (limo ~[1 2 3 4]) |=(i=@ (mod +(i) 4)))
+::      ~[4 1 2 3]
 ::    Source
-++  permute  !!
-::
+++  permute
+  |*  [a=(list) q=$-(@ @)]
+  =/  b=(list [@ _?>(?=(^ a) i.a)])  ~
+  =/  i  0
+  |-
+  ?~  a  +:(unzip (sort b aor))
+  $(a t.a, b [[(q i) i.a] b], i +(i))
 
-::    +pick: [(list T) chooser
+::
+::    +pick: [(list T1) chooser:$-(T1 (unit T2))] -> (unit T2)
 ::
 ::  Applies the given function to successive elements, returning the first
 ::  result where function returns Some(x) for some x. Crashes when no such
 ::  element exists.
 ::    Examples
-::    Crash
-::      'not found'
 ::    Source
 ++  pick  !!
 ::
@@ -1013,7 +1046,7 @@
 ::  Sorts the given list using Operators.compare.
 ::    Examples
 ::    Source
-++  sort  !!
+++  sort-x  !!
 ::
 
 ::    +sort-by: [(list T) projection:] -> (list T)
@@ -1143,16 +1176,22 @@
   |*  a=(list)
   ?~  a  ~
   `i.a
-
 ::    +try-item: [(list T) index:@] -> (unit T)
 ::
 ::  Tries to find the nth element in the list. Returns None if index is negative
 ::  or the list does not contain enough elements.
 ::    Examples
+::      > (try-item `(list @)`~["aa" "bb" "cc" "dd"] 2)
+::        [~ "cc"]
+::      > (try-item `(list tape)`~["aa" "bb"] 2)
+::      ~
 ::    Source
-++  try-item  !!
-::
+++  try-item
+  |*  [a=(list) i=@]
+  ?:  (gte i (lent a))  ~
+  `(snag i a)
 
+::
 ::    +try-pick: [(list T) chooser:$-(T (unit T))] -> (unit T)
 ::
 ::  Applies the given function to successive elements, returning Some(x) the
@@ -1242,6 +1281,22 @@
   |*  a=(list)
   ?~  a  ~
   `(rear a)
+::    +try-update-at: [(list T) index:@ value:T] -> (list T)
+::
+::  Return a new list with the item at a given index set to the new value.
+::    Examples
+::      > (try-update-at (limo ~[2 3 4]) 1 11)
+::      [~ ~[2 11 4]]
+::      > (try-update-at (limo ~[2 3 4]) 3 11)
+::      ~
+::    Crash
+::      'not found'
+::    Source
+++  try-update-at
+  |*  [a=(list) b=@ c=*]
+  ?:  (gte b (lent a))  ~
+  `(snap a b c)
+
 ::
 
 ::    +unfold: state generator
@@ -1283,15 +1338,19 @@
   |-
   ?~  a  [(flop b) (flop c) (flop d)]
   $(a t.a, b [-.i.a b], c [+<.i.a c], d [+>.i.a d])
-
-::    +update-at: index value source
+::    +update-at: [(list T) index:@ value:T] -> (list T)
 ::
 ::  Return a new list with the item at a given index set to the new value.
 ::    Examples
+::      > (update-at (limo ~[2 3 4]) 1 11)
+::      ~[2 11 4]
+::    Crash
+::      'not found'
 ::    Source
-++  update-at  !!
-::
-
+++  update-at
+  |*  [a=(list) b=@ c=*]
+  ?:  (gte b (lent a))  ~|('not found' !!)
+  (snap a b c)
 ::    +where: [(list T) predicate:$-(T ?)] -> (list T)
 ::
 ::  Returns a new list containing only the elements of the list for which the
@@ -1307,31 +1366,31 @@
   ?~  a  (flop b)
   ?.  (predicate i.a)  $(a t.a)
   $(a t.a, b [i.a b])
-::
-
 ::    +windowed: [(list T) window-size:@] -> (list (list T))
 ::
 ::  Returns a list of sliding windows containing elements drawn from the input
 ::  list. Each window is returned as a fresh list.
 ::    Examples
-::      > (windowed ~[1 2 3 4 5] 3)
+::      > (windowed (limo ~[1 2 3 4 5]) 3)
 ::      ~[~[1 2 3] ~[2 3 4] ~[3 4 5]]
+::    Crash
+::      'empty list'
+::      'window length is 0'
+::      'list shorter than window'
 ::    Source
-++  windowed  !!
-::  |*  [p=(list) q=@]
-::  =/  b=(list (list _?>(?=(^ p) i.p)))  ~
-::  =/  sub-tree=(list _?>(?=(^ p) i.p))  ~
-::  =/  pp=(list _?>(?=(^ p) i.p))  p
-::  |-  ^-  (list (list _?>(?=(^ p) i.p)))
-::  ?:  (lth (lent p) q)  (flop b)
-::  ?~  p  (flop b)
-::  ?:  =((lent sub-tree) q)
-::  ?~  p  ~|('cant get here' !!)
-::  $(p t.p, b [(flop sub-tree) b], sub-tree ~)
-::  ?~  pp  ~|('cant get here' !!)
-::  $(pp t.pp, sub-tree [i.pp sub-tree])
-
-
+++  windowed
+  |*  [p=(list *) q=@]
+  ?~  q  ~|('window length is 0' !!)
+  =/  b=(list (list _?>(?=(^ p) i.p)))  ~
+  =/  sub-tree=(list _?>(?=(^ p) i.p))  ~
+  =/  pp=(list _?>(?=(^ p) i.p))  p
+  |-  ^-  (list (list _?>(?=(^ p) i.p)))
+  ?~  p  ~|('empty list' !!)
+  ?~  pp  ?:  (lth (lent sub-tree) q)  ?~  b  ~|('list shorter than window' !!)  (flop b)
+  $(pp t.p, b [(flop sub-tree) b], sub-tree ~)
+  ?:  =((lent sub-tree) q)
+    $(p t.p, pp t.p, b [(flop sub-tree) b], sub-tree ~)
+  $(pp t.pp, sub-tree [i.pp sub-tree])
 ::    +zip: [(list T1) (list T2)] -> (list [T1 T2])
 ::
 ::  Combines the two lists into a list of pairs. The two lists must have equal
