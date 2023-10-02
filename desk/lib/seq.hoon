@@ -599,48 +599,80 @@
 ::      [~[['in' 2] ['out' 4] ['in' 6]] 5]
 ::    Source
 ++  map-fold
-  |*  [a=(list) state=* c=$-([* *] [* *])]  ::c=_|=(^ [** ** +<+])] 
-  =/  aa=(list)  ~  ::=(list _?>(?=(^ a) (c i.a)))
-  |-  ::^-  [(list _?>(?=(^ a) (c i.a))) _state]
+  |*  [a=(list) state=* c=$-([* *] [* *])]
+  =/  aa=(list)  ~
+  |-
   ?~  a  [(flop aa) state]
   =/  step  (c i.a state)
   $(a t.a, aa [-.step aa], state +.step)
-
-
-::    +map-fold-back: [(list T1) state:T2 mapping:$-()] ->
+::    +map-fold-back: [(list T1) state:T2 $-([T1 T2] [T3 T2])] -> [(list T3) T2]
 ::
 ::  Combines map and foldBack. Builds a new list whose elements are the results
-::  of applying the given function to each of the elements of the input list.
+::  of applying the given function to each of the elements of the input list, 
+::  starting from the end. 
 ::  The function is also used to accumulate a final value.
 ::    Examples
+::      > =input `(list [@t @])`~[['in' 1] ['out' 2] ['in' 3]]
+::      > =foo |*  [p=[@t @] state=@]
+::      ^-  [[@t @] @]
+::      ?:  =(-.p 'in')  [['in' (mul +.p 2)] (add state +.p)]
+::      [['out' (mul +.p 2)] (mul state +.p)]
+::      > (map-fold-back input 0 foo)
+::      [~[['in' 6] ['out' 4] ['in' 2]] 7]
 ::    Source
-++  map-fold-back  !!
-::
-
-::    +mapi: [(list T1) mapping:$-(T1 T2)] -> [@ (list T2)]
+++  map-fold-back
+  |*  [a=(list) state=* c=$-([* *] [* *])]
+  (map-fold (flop a) state c)
+::    +mapi: [(list T1) mapping:$-([@ T1] T2)] -> (list T2)
 ::
 ::  Builds a new collection whose elements are the results of applying the given
 ::  function to each of the elements of the collection. The integer index passed
 ::  to the function indicates the index (from 0) of element being transformed.
 ::    Examples
+::      > (mapi (limo ~[1 2 3]) |=([a=@ b=@] (add a b)))
+::      ~[1 3 5]
 ::    Source
-++  mapi  !!
-::
-
-::    +mapi2: [(list T1) (list T2) mapping 
+++  mapi
+  |*  [a=(list) fun=$-([@ *] *)]
+  =/  i  0
+  =/  b=(list)  ~
+  |-
+  ?~  a  (flop b)
+  $(a t.a, b [(fun i i.a) b], i +(i))
+::    +mapi2: [(list T1) (list T2) mapping:$-([@ T1 T2] T3)] -> (list T3)
 ::
 ::  Like mapi, but mapping corresponding elements from two lists of equal length.
 ::    Examples
+::      > (mapi2 (limo ~[1 2 3]) (limo ~[4 5 6]) |=([a=@ b=@ c=@] (add (add a b) c)))
+::      ~[5 8 11]
+::    Crash
+::      'lists of unequal length'
 ::    Source
-++  mapi2  !!
-::
-
-::    +max: (list @) -> *
+++  mapi2
+  |*  [a=(list) b=(list) fun=$-([@ * *] *)]
+  =/  i  0
+  =/  c=(list)  ~
+  |-
+  ?~  a  ?~  b  (flop c)  ~|('lists of unequal length' !!)
+  ?~  b  ~|('lists of unequal length' !!)
+  $(a t.a, b t.b, c [(fun i i.a i.b) c], i +(i))
+::    +max: (list T) -> T
 ::
 ::  Return the greatest of all elements of the list, compared via Operators.max.
 ::    Examples
+::      > (max (limo ~[10 12 11]))
+::      12
+::    Crash
+::      'empty list'
 ::    Source
-++  max  !!
+++  max
+  |*  a=(list)
+  ?~  a  ~|('empty list' !!)
+  =/  m  i.a
+  |-
+  ?~  a  m
+  ?:  (lth m i.a)  $(m i.a, a t.a)
+  $(a t.a)
 ::
 
 ::    +maxBy: (list T) projection
@@ -674,10 +706,17 @@
 ::  the exception of the first element which is only returned as the predecessor
 ::  of the second element.
 ::    Examples
+::    > (pairwise (limo ~[1 2 3 4]))
+::    ~[[1 2] [2 3] [3 4]]
 ::    Source
-++  pairwise  !!
-::
-
+++  pairwise
+  |*  a=(list)
+  =/  b=(list [_?>(?=(^ a) i.a) _?>(?=(^ a) i.a)])  ~
+  |-
+  ?:  (lth (lent a) 2)  (flop b)
+  ?~  a  ~|('cant get here' !!)
+  ?~  t.a  ~|('cant get here' !!)
+  $(a t.a, b [[i.a i.t.a] b])
 ::    +partition: [(list T) predicate:$-( T ?)] -> [(list T) (list T)]
 ::
 ::  Splits the collection into two collections, containing the elements for
@@ -1270,14 +1309,28 @@
   $(a t.a, b [i.a b])
 ::
 
-::    +windowed: [(list T) window-size:@] -> 
+::    +windowed: [(list T) window-size:@] -> (list (list T))
 ::
 ::  Returns a list of sliding windows containing elements drawn from the input
 ::  list. Each window is returned as a fresh list.
 ::    Examples
+::      > (windowed ~[1 2 3 4 5] 3)
+::      ~[~[1 2 3] ~[2 3 4] ~[3 4 5]]
 ::    Source
 ++  windowed  !!
-::
+::  |*  [p=(list) q=@]
+::  =/  b=(list (list _?>(?=(^ p) i.p)))  ~
+::  =/  sub-tree=(list _?>(?=(^ p) i.p))  ~
+::  =/  pp=(list _?>(?=(^ p) i.p))  p
+::  |-  ^-  (list (list _?>(?=(^ p) i.p)))
+::  ?:  (lth (lent p) q)  (flop b)
+::  ?~  p  (flop b)
+::  ?:  =((lent sub-tree) q)
+::  ?~  p  ~|('cant get here' !!)
+::  $(p t.p, b [(flop sub-tree) b], sub-tree ~)
+::  ?~  pp  ~|('cant get here' !!)
+::  $(pp t.pp, sub-tree [i.pp sub-tree])
+
 
 ::    +zip: [(list T1) (list T2)] -> (list [T1 T2])
 ::

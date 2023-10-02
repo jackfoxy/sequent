@@ -824,16 +824,78 @@
   %+  expect-eq
     !>  [~[['in' 2] ['out' 4] ['in' 6]] 5]
     !>  (map-fold `(list [@t @])`~[['in' 1] ['out' 2] ['in' 3]] 0 map-fold-foo)
-
 ::  +map-fold-back
+++  test-map-fold-back-00
+  %+  expect-eq
+    !>  [~ 0]
+    !>  (map-fold-back `(list [@t @])`~ 0 map-fold-foo)
+++  test-map-fold-back-01
+  %+  expect-eq
+    !>  [~[['in' 2]] 1]
+    !>  (map-fold-back `(list [@t @])`~[['in' 1]] 0 map-fold-foo)
+++  test-map-fold-back-example-00
+  %+  expect-eq
+    !>  [~[['in' 6] ['out' 4] ['in' 2]] 7]
+    !>  (map-fold-back `(list [@t @])`~[['in' 1] ['out' 2] ['in' 3]] 0 map-fold-foo)
 ::  +mapi
+++  test-mapi-00
+  %+  expect-eq
+    !>  ~
+    !>  (mapi `(list @)`~ |=([a=@ b=@] (add a b)))
+++  test-mapi-01
+  %+  expect-eq
+    !>  ~[0]
+    !>  (mapi (limo ~[5]) |=([a=@ b=@] (mul a b)))
+++  test-mapi-example-00
+  %+  expect-eq
+    !>  ~[1 3 5]
+    !>  (mapi (limo ~[1 2 3]) |=([a=@ b=@] (add a b)))
 ::  +mapi2
+++  test-mapi2-00
+  %+  expect-eq
+    !>  ~
+    !>  (mapi2 `(list @)`~ `(list @)`~ |=([a=@ b=@ c=@] (add (add a b) c)))
+++  test-mapi2-01
+  %+  expect-eq
+    !>  ~[6]
+    !>  (mapi2 (limo ~[5]) (limo ~[1]) |=([a=@ b=@ c=@] (add (add a b) c)))
+++  test-mapi2-fail-00
+  %-  expect-fail
+  |.  (mapi2 (limo ~[5]) `(list @)`~ |=([a=@ b=@ c=@] (add (add a b) c)))
+++  test-mapi2-fail-01
+  %-  expect-fail
+  |.  (mapi2 `(list @)`~ (limo ~[1]) |=([a=@ b=@ c=@] (add (add a b) c)))
+++  test-mapi2-example-00
+  %+  expect-eq
+    !>  ~[5 8 11]
+    !>  (mapi2 (limo ~[1 2 3]) (limo ~[4 5 6]) |=([a=@ b=@ c=@] (add (add a b) c)))
+
 ::  +max
 ::  +max-by
 ::  +min
 ::  +min-by
+
 ::  +pairwise
-::
+++  test-pairwise-00
+  %+  expect-eq
+    !>  ~
+    !>  (pairwise `(list @)`~)
+++  test-pairwise-01
+  %+  expect-eq
+    !>  ~
+    !>  (pairwise (limo ~[1]))
+++  test-pairwise-02
+  %+  expect-eq
+    !>  ~[[1 2]]
+    !>  (pairwise (limo ~[1 2]))
+++  test-pairwise-03
+  %+  expect-eq
+    !>  ~[[1 2] [2 3]]
+    !>  (pairwise (limo ~[1 2 3]))
+++  test-pairwise-example-00
+  %+  expect-eq
+    !>  ~[[1 2] [2 3] [3 4]]
+    !>  (pairwise (limo ~[1 2 3 4]))
 ::  +partition
 ++  test-partition-00
   %+  expect-eq
