@@ -1,7 +1,7 @@
 ::  /lib/seq/hoon
-::
+::    |seq
 ::    operations for working with values of type list
-::  ^seq
+::  
 |%
 ::    +all-pairs: [(list T1) (list T2)] -> (list [T1 T2])
 ::
@@ -74,10 +74,12 @@
 ::    Examples
 ::      > (chunk-by-size (limo ~[1 2 3 4 5 6 7]) 2)
 ::      [i=~[1 2] t=[i=~[3 4] t=~[~[5 6] ~[7]]]]
+::    Crash
+::      'chunk size is 0'
 ::    Source
 ++  chunk-by-size
   |*  [p=(list) q=@ud]
-  ?:  =(0 q)  ~|("non-zero size required" !!)
+  ?:  =(0 q)  ~|('chunk size is 0' !!)
   =/  res=(list (list _?>(?=(^ p) i.p)))  ~
   =/  i=@ud  0
   =/  next=(list _?>(?=(^ p) i.p))  ~
@@ -274,7 +276,7 @@
   $(a t.a, b t.b)
 ::    +filter: [(list T) predicate:$-(T ?)] -> (list T)
 ::
-::  Returns a new collection containing only the elements of the collection for
+::  Returns a new list containing only the elements of the list for
 ::  which the given predicate returns "true"
 ::    Examples
 ::      > =a |=(a=@ (gth a 1))
@@ -296,7 +298,7 @@
   (scag q p)
 ::    +fold: [(list T1) state:T2 folder:$-([T1 T2] T2)] -> T2 
 ::
-::  Applies a function to each element of the collection, threading an
+::  Applies a function to each element of the list, threading an
 ::  accumulator argument through the computation. Take the second argument, and
 ::  apply the function to it and the first element of the list. Then feed this
 ::  result into the function along with the second element and so on. Return the
@@ -313,13 +315,15 @@
   $(a t.a, b (c i.a b))
 ::    +fold2: [(list T1) (list T2) state:T3 folder:$-([T1 T2 T3] T3)] -> T3
 ::
-::  Applies a function to corresponding elements of two collections, threading
-::  an accumulator argument through the computation. The collections must have
+::  Applies a function to corresponding elements of two lists, threading
+::  an accumulator argument through the computation. The lists must have
 ::  identical sizes. If the input function is f and the elements are i0...iN and
 ::  j0...jN then computes f (... (f s i0 j0)...) iN jN.
 ::    Examples
 ::      > (fold2 (limo ~["Tails" "Head" "Tails"]) (limo ~["Tails" "Head" "Head"]) 0 |=([n1=tape n2=tape state=@] ?:(=(n1 n2) +(state) state)))
 ::      2
+::    Crash
+::      'lists of unequal length'
 ::    Source
 ++  fold2
   |*  [a=(list) b=(list) c=* d=_|=(^ [** ** +<+])]
@@ -329,7 +333,7 @@
   $(a t.a, b t.b, c (d i.a i.b c))
 ::    +fold-back: [(list T1) state:T2 folder:$-([T1 T2] T2)] -> T2
 ::
-::  Applies a function to each element of the collection, starting from the end,
+::  Applies a function to each element of the list, starting from the end,
 ::  threading an accumulator argument through the computation. If the input
 ::  function is f and the elements are i0...iN then computes f i0 (...(f iN s)).
 ::    Examples
@@ -345,8 +349,8 @@
   (fold (flop a) b c)
 ::    +fold-back2: [(list T1) (list T2) state:T3 folder:$-([T1 T2 T3] T3)] -> T3
 ::
-::  Applies a function to corresponding elements of two collections, threading
-::  an accumulator argument through the computation. The collections must have
+::  Applies a function to corresponding elements of two lists, threading
+::  an accumulator argument through the computation. The lists must have
 ::  identical sizes. If the input function is f and the elements are i0...iN and
 ::  j0...jN then computes f i0 j0 (...(f iN jN s)).
 ::    Examples
@@ -358,7 +362,7 @@
   (fold2 (flop a) (flop b) c d)
 ::    +forall: [(list T) predicate:$-(T ?)] -> ?
 ::
-::  Tests if all elements of the collection satisfy the given predicate.
+::  Tests if all elements of the list satisfy the given predicate.
 ::    Examples
 ::      > (forall (limo ~[2 4 8]) |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
 ::      %.y
@@ -373,13 +377,15 @@
   $(a t.a)
 ::    +forall2: [(list T1) (list T2) predicate:$-([T1 T2] ?)] -> ?
 ::
-::  Tests if all corresponding elements of the collection satisfy the given
+::  Tests if all corresponding elements of the list satisfy the given
 ::  predicate pairwise. Crashes on lists of unequal length
 ::    Examples
 ::      > (forall (limo ~[1 4 8]) (limo ~[3 4 8]) |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n)))
 ::      %.y
 ::      > (forall (limo ~[1 5 8]) (limo ~[3 4 8]) |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n)))
 ::      %.y
+::    Crash
+::      'lists of unequal length'
 ::    Source
 ++  forall2
   |*  [a=(list) b=(list) predicate=$-(* ?)]
@@ -408,10 +414,12 @@
 ::    Examples
 ::      > (get-tail ~[1 2])
 ::      ~[2]
+::    Crash
+::      'empty list'
 ::    Source
 ++  get-tail
   |*  a=(list)
-  ?~  a  ~|("empty list" !!)
+  ?~  a  ~|('empty list' !!)
   t.a
 ::    +group-by: [(list T1) projection:$-(T1 T2)] -> (list [T2 (list T1)]) 
 ::
@@ -467,22 +475,24 @@
 ::
 ::  Return a new list with a new item inserted before the given index.
 ::    Examples
-::    > (insert-at (limo ~[2 3 4]) 1 11)
-::    ~[2 11 3 4]
+::      > (insert-at (limo ~[2 3 4]) 1 11)
+::      ~[2 11 3 4]
 ::    Source
 ++  insert-at  into
 ::    +insertManyAt: [(list T) values=(list T) index=@] -> (list T)
 ::
 ::  Return a new list with new items inserted before the given index.
 ::    Examples
-::    > (insert-many-at (limo ~[1 2 5 6 7]) (limo ~[3 4]) 2)
-::    ~[1 2 3 4 5 6 7]
+::      > (insert-many-at (limo ~[1 2 5 6 7]) (limo ~[3 4]) 2)
+::      ~[1 2 3 4 5 6 7]
+::    Crash
+::      'out of range'
 ::    Source
 ++  insert-many-at
   |*  [a=(list) values=(list) i=@]
   ?:  =(0 (lent values))  a  
   =/  len-a  (lent a)
-  ?:  (gth i len-a)  ~|("index outside of range" !!)
+  ?:  (gth i len-a)  ~|('out of range' !!)
   ?~  values  a
   ?:  =(0 i)  (weld values a)
   ?:  =(len-a i)  (weld a values)
@@ -511,6 +521,58 @@
 ++  item
   |*  [a=(list) i=@]
   (snag i a)
+::    +iter: [(list T) fun:$-(T *)] -> ~
+::
+::  Applies the given function to each element of the list, dropping the
+::  results.
+::    Examples
+::      > (iter (limo ~["tape1" "tape2"]) |=(a=tape (lent a)))
+::      ~
+::    Source
+++  iter
+  |*  [a=(list) fun=$-(* *)]
+  =/  b  (turn a fun)
+  ~
+::    +iter2: [(list T1) (list T2) fun:$-(T1 T2 *)] -> ~
+::
+::  Applies the given function to two lists simultaneously, dropping the
+::  results. The lists must have identical size.
+::    Examples
+::      > (iter2 (limo ~["tape1" "tape2"]) (limo ~["tape3" "tape4"]) |=([a=tape b=tape] (add (lent a) (lent b))))
+::      ~
+::    Crash
+::      'lists of unequal length'
+::    Source
+++  iter2
+  |*  [a=(list) b=(list) fun=$-(* *)]
+  =/  b  (map2 a b fun)
+  ~
+::    +iteri: [(list T) fun:$-([@ T] *)] -> ~
+::
+::  Applies the given function to each element of the list and the index
+::  of element, dropping the results.
+::    Examples
+::      > (iteri (limo ~[1 2 3]) |=([a=@ b=@] (add a b)))
+::      ~
+::    Source
+++  iteri
+|*  [a=(list) fun=$-(* *)]
+  =/  b  (mapi a fun)
+  ~
+::    +iteri2: [(list T1) (list T2) fun:$-(@ T1 T2 *)] -> ~
+::
+::  Applies the given function to two lists and the current index,
+::  dropping the results. The lists must have identical size.
+::    Examples
+::      > (iteri2 (limo ~[1 2 3]) (limo ~[4 5 6]) |=([a=@ b=@ c=@] (add (add a b) c)))
+::      ~
+::    Crash
+::      'lists of unequal length'
+::    Source
+++  iteri2
+  |*  [a=(list) b=(list) fun=$-(* *)]
+  =/  b  (mapi2 a b fun)
+  ~
 ::    +last-n: [(list  T) count:@] -> (list  T)
 ::
 ::  Returns the last N elements of the list.
@@ -547,8 +609,8 @@
 ++  map-seq  turn
 ::    +map2: [(list T1) (list T2) mapping:$-([T1 T2] T3)] -> (list T3)
 ::
-::  Builds a new collection whose elements are the results of applying the given
-::  function to the corresponding elements of the two collections pairwise.
+::  Builds a new list whose elements are the results of applying the given
+::  function to the corresponding elements of the two lists pairwise.
 ::  Crashes if lists are of unequal length
 ::    Examples
 ::      >  (map2 (limo ~[1 2 3 4]) (limo ~[5 6 7 8]) |=(a=[@ @] (add -.a +.a)))
@@ -565,8 +627,8 @@
   $(a t.a, b t.b, d [(c i.a i.b) d])
 ::    +map3: [(list T1) (list T2) (list T3) $-([T1 T2 T3] T4)] -> (list T4)
 ::
-::  Builds a new collection whose elements are the results of applying the given
-::  function to the corresponding elements of the three collections
+::  Builds a new list whose elements are the results of applying the given
+::  function to the corresponding elements of the three lists
 ::  simultaneously.
 ::    Examples
 ::      > (map2 (limo ~[1 2 3 4]) (limo ~[5 6 7 8]) (limo ~[9 10 11 12]) |=(a=[@ @ @] (add (add -.a +<.a) +>.a)))
@@ -625,8 +687,8 @@
   (map-fold (flop a) state c)
 ::    +mapi: [(list T1) mapping:$-([@ T1] T2)] -> (list T2)
 ::
-::  Builds a new collection whose elements are the results of applying the given
-::  function to each of the elements of the collection. The integer index passed
+::  Builds a new list whose elements are the results of applying the given
+::  function to each of the elements of the list. The integer index passed
 ::  to the function indicates the index (from 0) of element being transformed.
 ::    Examples
 ::      > (mapi (limo ~[1 2 3]) |=([a=@ b=@] (add a b)))
@@ -748,7 +810,7 @@
   $(a t.a, b [[i.a i.t.a] b])
 ::    +partition: [(list T) predicate:$-( T ?)] -> [(list T) (list T)]
 ::
-::  Splits the collection into two collections, containing the elements for
+::  Splits the list into two lists, containing the elements for
 ::  which the given predicate returns True and False respectively. Element order
 ::  is preserved in both of the created lists.
 ::    Examples
@@ -773,20 +835,10 @@
   ?~  a  +:(unzip (sort b aor))
   $(a t.a, b [[(q i) i.a] b], i +(i))
 
-::
-::    +pick: [(list T1) chooser:$-(T1 (unit T2))] -> (unit T2)
-::
-::  Applies the given function to successive elements, returning the first
-::  result where function returns Some(x) for some x. Crashes when no such
-::  element exists.
-::    Examples
-::    Source
-++  pick  !!
-::
 
 ::    +reduce: [(list) reduction 
 ::
-::  Apply a function to each element of the collection, threading an accumulator
+::  Apply a function to each element of the list, threading an accumulator
 ::  argument through the computation. Apply the function to the first two
 ::  elements of the list. Then feed this result into the function along with the
 ::  third element and so on. Return the final result. If the input function is f
@@ -798,7 +850,7 @@
 
 ::    +reduceBack: [(list T) reduction 
 ::
-::  Applies a function to each element of the collection, starting from the end,
+::  Applies a function to each element of the list, starting from the end,
 ::  threading an accumulator argument through the computation. If the input
 ::  function is f and the elements are i0...iN then computes 
 ::  f i0 (...(f iN-1 iN)).
@@ -815,10 +867,12 @@
 ::      "good day urbit!"
 ::      > (remove-at `(list @)`[1 2 3 4 ~] 2)
 ::      ~[1 2 4]
+::    Crash
+::      'out of range'
 ::    Source
 ++  remove-at
   |*  [a=(list) i=@]
-  ?:  (gte i (lent a))  ~|("out of range" !!)
+  ?:  (gte i (lent a))  ~|('out of range' !!)
   (oust [i 1] a)
 ::    +remove-many-at: [(list T) index=@ count=@] -> (list T)
 ::
@@ -828,10 +882,13 @@
 ::      "good urbit!"
 ::      > (remove-many-at `(list @)`[1 2 3 4 ~] [2 2])
 ::      ~[1 2]
+::    Crash
+::      'out of range'
 ::    Source
 ++  remove-many-at
-  |*  [a=(list) b=@ c=@]
-  (oust [b c] a)
+  |*  [a=(list) i=@ c=@]
+  ?:  (gth (add i c) (lent a))  ~|('out of range' !!)
+  (oust [i c] a)
 ::    +replicate: [count=@ initial=T] -> (list T)
 ::
 ::  Creates a list by replicating the given initial value.
@@ -855,9 +912,11 @@
 ::      ~[1 2 3]
 ::    Source
 ++  reverse  flop
+
+
 ::    +scan: [(list T) state folder
 ::
-::  Applies a function to each element of the collection, threading an
+::  Applies a function to each element of the list, threading an
 ::  accumulator argument through the computation. Take the second argument, and
 ::  apply the function to it and the first element of the list. Then feed this
 ::  result into the function along with the second element and so on. Returns
@@ -918,6 +977,26 @@
   |*  [hstk=(list) nedl=(list)]
   ^-  (list @)
   (fand nedl hstk)
+::    +search-all-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> (list T2)
+::
+::  Applies the given function to successive elements, returning the list of
+::  elements where the function returns Some(x). 
+::  Crashes when no such element exists.
+::    Examples
+::      >  (search-all-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+::      ~[2 4]
+::    Crash
+::      'not found'
+::    Source
+++  search-all-by-unit
+  |*  [hstk=(list) nedl=$-(* (unit *))]
+  =/  b=(list _?>(?=(^ hstk) i.hstk))  ~
+  |-  ^-  (list _?>(?=(^ hstk) i.hstk))
+  ?~  hstk  ?~  b  ~|('not found' !!)
+  (flop b)
+  =/  x  (nedl i.hstk)
+  ?~  x  $(hstk t.hstk)
+  $(hstk t.hstk, b [(need x) b])
 ::    +search-back: [(list T) predicate:$-(T ?)] -> T
 ::
 ::  Returns the last element for which the given function returns True. 
@@ -943,6 +1022,21 @@
 ++  search-back-by-list
   |*  [hstk=(list) nedl=(list)]
   (tail-end (search-all-by-list hstk nedl))
+::    +search-back-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> T2
+::
+::  Applies the given function to successive elements from the end back, 
+::  returning the first result where function returns Some(x) for some x.
+::  Crashes when no such element exists.
+::    Examples
+::      >  (search-back-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+::      4
+::    Crash
+::      'not found'
+::    Source
+++  search-back-by-unit
+  |*  [hstk=(list) nedl=$-(* (unit *))]
+  ^-  _?>(?=(^ hstk) i.hstk)
+  (search-by-unit (flop hstk) nedl)
 ::    +search-by-list: [(list T) arg:(list T)] -> @
 ::
 ::  Produces the index of the first occurrence of the argument list sequence in
@@ -950,12 +1044,32 @@
 ::    Examples
 ::      > (search-by-list "cbabab" "ab")
 ::      2
+::    Crash
+::      'not found'
 ::    Source
 ++  search-by-list
   |*  [hstk=(list) nedl=(list)]
   ^-  @
   =/  x  (find nedl hstk)
   ?~  x  ~|('not found' !!)  (need x)
+::    +search-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> T2
+::
+::  Applies the given function to successive elements, returning the first
+::  result where function returns Some(x) for some x. Crashes when no such
+::  element exists.
+::    Examples
+::      >  (search-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+::      2
+::    Crash
+::      'not found'
+::    Source
+++  search-by-unit
+  |*  [hstk=(list) nedl=$-(* (unit *))]
+  |-  ^-  _?>(?=(^ hstk) i.hstk)
+  ?~  hstk  ~|('not found' !!)
+  =/  x  (nedl i.hstk)
+  ?~  x  $(hstk t.hstk)
+  (need x)
 ::    +search-index: [(list T) predicate:$-(T ?)] -> @
 ::
 ::  Returns the index of the first element in the list that satisfies the given
@@ -1024,10 +1138,12 @@
 ::    Examples
 ::      > (skip-n `(list @)`[1 2 3 4 ~] 2)
 ::      ~[3 4]
+::    Crash
+::      'out of range'
 ::    Source
 ++  skip-n
   |*  [p=(list) q=@]
-  ?~  p  ?~  q  p  ~|("out of range" !!)
+  ?~  p  ?~  q  p  ~|('out of range' !!)
   ?~  q  p
   $(p t.p, q (dec q))
 ::
@@ -1041,48 +1157,52 @@
 ++  skip-while  !!
 ::
 
-::    +sort: (list T) -> (list T)
-::
-::  Sorts the given list using Operators.compare.
-::    Examples
-::    Source
-++  sort-x  !!
-::
-
-::    +sort-by: [(list T) projection:] -> (list T)
+::    +sort-by: [(list T) projection:$-(T *)] -> (list T)
 ::
 ::  Sorts the given list using keys given by the given projection. Keys are
 ::  compared using Operators.compare.
 ::    Examples
+::      > (sort-by (limo ~["bb" "a" "dddd" "ccc"]) |=(a=tape (lent a)))
+::      ~["a" "bb" "ccc" "dddd"]
 ::    Source
-++  sort-by  !!
-::
-
-::    +sort-by-descending: [(list T) projection:] -> (list T)
+++  sort-by
+  |*  [a=(list) proj=$-(* *)]
+  =/  b  (turn a proj)
+  =/  c  (zip b a)
+  +:(unzip (sort c aor))
+::    +sort-by-descending: [(list T) projection:$-(T *)] -> (list T)
 ::
 ::  Sorts the given list in descending order using keys given by the given
 ::  projection. Keys are compared using Operators.compare.
 ::    Examples
+::      > (sort-by-descending (limo ~["bb" "a" "dddd" "ccc"]) |=(a=tape (lent a)))
+::      ~["dddd" "ccc" "bb" "a"]
 ::    Source
-++  sort-by-descending  !!
-::
-
+++  sort-by-descending
+  |*  [a=(list) proj=$-(* *)]
+  =/  b  (turn a proj)
+  =/  c  (zip b a)
+  +:(unzip (sort c |=([a=* b=*] (aor b a))))
 ::    +sort-descending: (list T) -> (list T)
 ::
 ::  Sorts the given list in descending order using Operators.compare.
 ::    Examples
+::      > (sort-descending (limo ~[4 2 1 3]))
+::      ~[4 3 2 1]
 ::    Source
-++  sort-descending  !!
+++  sort-descending
+  |*  a=(list)
+  (sort a |=([a=* b=*] (aor b a)))
+::    +sort-qik: (list T) -> (list T)
 ::
-
-::    +sort-with: [(list T) comparer:] -> (list T)
-::
-::  Sorts the given list using the given comparison function.
+::  Sorts the given list using Operators.compare.
 ::    Examples
+::      > (sort-qik (limo ~[4 2 1 3]))
+::      ~[1 2 3 4]
 ::    Source
-++  sort-with  !!
-::
-
+++  sort-qik
+  |*  a=(list)
+  (sort a aor)
 ::    +split-at: [(list T) index:@] -> [(list T) (list T)]
 ::
 ::  Splits a list into two lists, at the given index.
@@ -1091,6 +1211,7 @@
 ++  split-at
   |*  [p=(list) i=@]
   [(scag i p) (slag i p)]
+
 ::
 
 ::    +split-into: [(list T) count:@] -> (list (list T))
@@ -1111,7 +1232,7 @@
 ++  sum  !!
 ::
 
-::    +sum-by: [(list T) projection 
+::    +sum-by: [(list T) projection:$-(T @)] -> @
 ::
 ::  Returns the sum of the results generated by applying the function to each
 ::  element of the list.
@@ -1190,18 +1311,34 @@
   |*  [a=(list) i=@]
   ?:  (gte i (lent a))  ~
   `(snag i a)
-
+::    +try-remove-at: [(list T) index:@] -> (unit (list T))
 ::
-::    +try-pick: [(list T) chooser:$-(T (unit T))] -> (unit T)
-::
-::  Applies the given function to successive elements, returning Some(x) the
-::  first result where function returns Some(x) for some x.
-::  If no such element exists then return None.
+::  Attempt a new list with the item at a given index removed returning 
+::  Some((list T)) upon success.
 ::    Examples
+::      > (try-remove-at "good day, urbit!" 8)
+::      [~ "good day urbit!"]
+::      > (try-remove-at `(list @)`[1 2 3 4 ~] 2)
+::      [~ ~[1 2 4]]
 ::    Source
-++  try-pick  !!
+++  try-remove-at
+  |*  [a=(list) i=@]
+  ?:  (gte i (lent a))  ~
+  `(oust [i 1] a)
+::    +try-remove-many-at: [(list T) index=@ count=@] -> (list T)
 ::
-
+::  Return a new list with the number of items starting at a given index removed
+::  returning Some((list T)) upon success.
+::    Examples
+::      > (try-remove-many-at "good day, urbit!" [4 5])
+::      [~ "good urbit!"]
+::      > (try-remove-many-at `(list @)`[1 2 3 4 ~] [2 2])
+::      [~ ~[1 2]]
+::    Source
+++  try-remove-many-at
+  |*  [a=(list) i=@ c=@]
+  ?:  (gth (add i c) (lent a))  ~
+  `(oust [i c] a)
 ::    +try-search: [(list T) predicate:$-(T ?)] -> (unit T)
 ::
 ::  Returns the first element for which the given function returns True.
@@ -1227,6 +1364,23 @@
   |*  [a=(list) b=$-(* ?)]
   ?~  a  ~
   (try-search (flop a) b)
+::    +try-search-by-unit: [(list T) chooser:$-(T (unit T))] -> (unit T)
+::
+::  Applies the given function to successive elements, returning Some(x) for the
+::  first result where function returns Some(x).
+::  If no such element exists then return None.
+::    Examples
+::      >  (search-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+::      `2
+::    Crash
+::      'not found'
+::    Source
+++  try-search-by-unit
+  |*  [hstk=(list) nedl=$-(* (unit *))]
+  |-  ^-  (unit _?>(?=(^ hstk) i.hstk))
+  ?~  hstk  ~
+  =/  x  (nedl i.hstk)
+  ?~  x  $(hstk t.hstk)  x
 ::    +try-search-index: [(list T) predicate:$-(T ?)] -> (unit @)
 ::
 ::  Returns the index of the first element in the list that satisfies the given
@@ -1398,6 +1552,8 @@
 ::    Examples
 ::      > (zip `(list @)`~[1 2] `(list @)`~["aa" "bb"])
 ::      ~[[1 "aa"] [2 "bb"]]
+::    Crash
+::      'lists of unequal length'
 ::    Source
 ++  zip
   |*  [a=(list) b=(list)]
@@ -1413,6 +1569,8 @@
 ::    Examples
 ::      > (zip3 `(list @)`~[1 2] `(list tape)`~["aa" "bb"] `(list @t)`~['a' 'b'])
 ::      ~[[1 "aa" 'a'] [2 "bb" 'b']]
+::    Crash
+::      'lists of unequal length'
 ::    Source
 ++  zip3
   |*  [a=(list) b=(list) c=(list)]

@@ -697,14 +697,70 @@
   %+  expect-eq
     !>  "cc"
     !>  (item `(list tape)`~["aa" "bb" "cc" "dd"] 2)
-
-
 ::  +iter
+++  test-iter-00
+  %+  expect-eq
+    !>  ~
+    !>  (iter `(list tape)`~ |=(a=tape (lent a)))
+++  test-iter-01
+  %+  expect-eq
+    !>  ~
+    !>  (iter (limo ~["tape1"]) |=(a=tape (lent a)))
+++  test-iter-example-00
+  %+  expect-eq
+    !>  ~
+    !>  (iter (limo ~["tape1" "tape2"]) |=(a=tape (lent a)))
 ::  +iter2
+++  test-iter2-00
+  %+  expect-eq
+    !>  ~
+    !>  (iter2 `(list tape)`~ `(list tape)`~ |=([a=tape b=tape] (add (lent a) (lent b))))
+++  test-iter2-01
+  %+  expect-eq
+    !>  ~
+    !>  (iter2 (limo ~["tape1"]) (limo ~["tape2"]) |=([a=tape b=tape] (add (lent a) (lent b))))
+++  test-iter2-fail-00
+  %-  expect-fail
+  |.  (iter2 (limo ~["tape1" "tape2"]) (limo ~["tape3"]) |=([a=tape b=tape] (add (lent a) (lent b))))
+++  test-iter2-fail-01
+  %-  expect-fail
+  |.  (iter2 (limo ~["tape1"]) (limo ~["tape2" "tape3"]) |=([a=tape b=tape] (add (lent a) (lent b))))
+++  test-iter2-example-00
+  %+  expect-eq
+    !>  ~
+    !>  (iter2 (limo ~["tape1" "tape2"]) (limo ~["tape3" "tape4"]) |=([a=tape b=tape] (add (lent a) (lent b))))
 ::  +iteri
+++  test-iteri-00
+  %+  expect-eq
+    !>  ~
+    !>  (iteri `(list tape)`~ |=([a=@ b=tape] (add (lent b) a)))
+++  test-iteri-01
+  %+  expect-eq
+    !>  ~
+    !>  (iteri (limo ~["tape1"]) |=([a=@ b=tape] (add (lent b) a)))
+++  test-iteri-example-00
+  %+  expect-eq
+    !>  ~
+    !>  (iteri (limo ~[1 2 3]) |=([a=@ b=@] (add a b)))
 ::  +iteri2
-::
-
+++  test-iteri2-00
+  %+  expect-eq
+    !>  ~
+    !>  (iteri2 `(list tape)`~ `(list tape)`~ |=([c=@ a=tape b=tape] (add c (add (lent a) (lent b)))))
+++  test-iteri2-01
+  %+  expect-eq
+    !>  ~
+    !>  (iteri2 (limo ~["tape1"]) (limo ~["tape2"]) |=([c=@ a=tape b=tape] (add c (add (lent a) (lent b)))))
+++  test-iteri2-fail-00
+  %-  expect-fail
+  |.  (iteri2 (limo ~["tape1" "tape2"]) (limo ~["tape3"]) |=([c=@ a=tape b=tape] (add c (add (lent a) (lent b)))))
+++  test-iteri2-fail-01
+  %-  expect-fail
+  |.  (iteri2 (limo ~["tape1"]) (limo ~["tape2" "tape3"]) |=([c=@ a=tape b=tape] (add c (add (lent a) (lent b)))))
+++  test-iteri2-example-00
+  %+  expect-eq
+    !>  ~
+    !>  (iteri2 (limo ~[1 2 3]) (limo ~[4 5 6]) |=([a=@ b=@ c=@] (add (add a b) c)))
 ::  +last-n
 ++  test-last-n-00
   %+  expect-eq
@@ -982,7 +1038,6 @@
     !>  ~[4 1 2 3]
     !>  (permute (limo ~[1 2 3 4]) |=(i=@ (mod +(i) 4)))
 
-::  +pick
 ::  +reduce
 ::  +reduce-back
 
@@ -1018,38 +1073,35 @@
   %+  expect-eq
     !>  ~
     !>  (remove-many-at ~ [0 0])
-++  test-remove-many-at-01
-  %+  expect-eq
-    !>  ~
-    !>  (remove-many-at ~ [0 1])
 ++  test-remove-many-at-02
-  %+  expect-eq
-    !>  ~
-    !>  (remove-many-at ~ [1 0])
-++  test-remove-many-at-03
   %+  expect-eq
     !>  ~[1]
     !>  (remove-many-at (limo ~[1]) [0 0])
-++  test-remove-many-at-04
+++  test-remove-many-at-03
   %+  expect-eq
     !>  ~[1]
     !>  (remove-many-at (limo ~[1]) [1 0])
-++  test-remove-many-at-05
+++  test-remove-many-at-04
   %+  expect-eq
     !>  ~
     !>  (remove-many-at (limo ~[1]) [0 1])
-++  test-remove-many-at-06
-  %+  expect-eq
-    !>  ~
-    !>  (remove-many-at `(list @)`[1 2 ~] [0 3])
-++  test-remove-many-at-07
+++  test-remove-many-at-05
    %+  expect-eq
     !>  ~[1 2 5]
     !>  (remove-many-at `(list @)`[1 2 3 4 5 ~] [2 2])
-++  test-remove-many-at-08
+++  test-remove-many-at-06
   %+  expect-eq
     !>  ~[1 2 3 4 5]
-    !>  (remove-many-at `(list @)`[1 2 3 4 5 ~] [2 0])  
+    !>  (remove-many-at `(list @)`[1 2 3 4 5 ~] [2 0])
+++  test-remove-many-at-fail-00
+  %-  expect-fail
+  |.  (remove-many-at ~ [0 1])
+++  test-remove-many-at-fail-01
+  %-  expect-fail
+  |.  (remove-many-at ~ [1 0])
+++  test-remove-many-at-fail-02
+  %-  expect-fail
+  |.  (remove-many-at (limo ~[1]) [0 2])
 ++  test-remove-many-at-example-00
   %+  expect-eq
     !>  "good urbit!"
@@ -1163,6 +1215,21 @@
   %+  expect-eq
     !>  ~[1 3]
     !>  (search-all-by-list "cbabab" "ba")
+::  +search-all-by-unit
+++  test-search-all-by-unit-00
+  %+  expect-eq
+    !>  ~[2]
+    !>  (search-all-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-search-all-by-unit-fail-00
+  %-  expect-fail
+  |.  (search-all-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-search-all-by-unit-fail-01
+  %-  expect-fail
+  |.  (search-all-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-search-all-by-unit-example-00
+  %+  expect-eq
+    !>  ~[2 4]
+    !>  (search-all-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
 ::  +search-back
 ++  test-search-back-00
   %+  expect-eq
@@ -1196,6 +1263,21 @@
   %+  expect-eq
     !>  3
     !>  (search-back-by-list "cbabab" "ba")
+::  +search-back-by-unit
+++  test-search-back-by-unit-00
+  %+  expect-eq
+    !>  2
+    !>  (search-back-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-search-back-by-unit-fail-00
+  %-  expect-fail
+  |.  (search-back-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-search-back-by-unit-fail-01
+  %-  expect-fail
+  |.  (search-back-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-search-back-by-unit-example-00
+  %+  expect-eq
+    !>  4
+    !>  (search-back-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
 ::  +search-index
 ++  test-search-index-00
   %+  expect-eq
@@ -1240,6 +1322,21 @@
   %+  expect-eq
     !>  2
     !>  (search-by-list "cbabab" "ab")
+::  +search-by-unit
+++  test-search-by-unit-00
+  %+  expect-eq
+    !>  2
+    !>  (search-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-search-by-unit-fail-00
+  %-  expect-fail
+  |.  (search-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-search-by-unit-fail-01
+  %-  expect-fail
+  |.  (search-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-search-by-unit-example-00
+  %+  expect-eq
+    !>  2
+    !>  (search-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
 ::  +search-index-all
 ++  test-search-index-all-00
   %+  expect-eq
@@ -1315,13 +1412,78 @@
   %+  expect-eq
     !>  ~[3 4]
     !>  (skip-n `(list @)`[1 2 3 4 ~] 2)
-::  +skip-while
-::  +sort
-::  +sort-by
-::  +sort-by-descending
-::  +sort-descending
-::  +sort-with
 
+::  +skip-while
+
+
+::  +sort-by
+++  test-sort-by-00
+  %+  expect-eq
+    !>  ~
+    !>  (sort-by `(list tape)`~ |=(a=tape (lent a)))
+++  test-sort-by-01
+  %+  expect-eq
+    !>  ~["a"]
+    !>  (sort-by (limo ~["a"]) |=(a=tape (lent a)))
+++  test-sort-by-02
+  %+  expect-eq
+    !>  ~["a" "bb"]
+    !>  (sort-by (limo ~["bb" "a"]) |=(a=tape (lent a)))
+++  test-sort-by-example-00
+  %+  expect-eq
+    !>  ~["a" "bb" "ccc" "dddd"]
+    !>  (sort-by (limo ~["bb" "a" "dddd" "ccc"]) |=(a=tape (lent a)))
+::  +sort-by-descending
+++  test-sort-by-descending-00
+  %+  expect-eq
+    !>  ~
+    !>  (sort-by-descending `(list tape)`~ |=(a=tape (lent a)))
+++  test-sort-by-descending-01
+  %+  expect-eq
+    !>  ~["a"]
+    !>  (sort-by-descending (limo ~["a"]) |=(a=tape (lent a)))
+++  test-sort-by-descending-02
+  %+  expect-eq
+    !>  ~["bb" "a"]
+    !>  (sort-by-descending (limo ~["a" "bb"]) |=(a=tape (lent a)))
+++  test-sort-by-descending-example-00
+  %+  expect-eq
+    !>  ~["dddd" "ccc" "bb" "a"]
+    !>  (sort-by-descending (limo ~["bb" "a" "dddd" "ccc"]) |=(a=tape (lent a)))
+::  +sort-descending
+++  test-sort-descending-00
+  %+  expect-eq
+    !>  ~
+    !>  (sort-descending `(list @)`~)
+++  test-sort-descending-01
+  %+  expect-eq
+    !>  ~[1]
+    !>  (sort-descending (limo ~[1]))
+++  test-sort-descending-02
+  %+  expect-eq
+    !>  ~["good" "bad"]
+    !>  (sort-descending (limo ~["bad" "good"]))
+++  test-sort-descending-example-00
+  %+  expect-eq
+    !>  ~[4 3 2 1]
+    !>  (sort-descending (limo ~[4 2 1 3]))
+::  +sort-qik
+++  test-sort-qik-00
+  %+  expect-eq
+    !>  ~
+    !>  (sort-qik `(list @)`~)
+++  test-sort-qik-01
+  %+  expect-eq
+    !>  ~[1]
+    !>  (sort-qik (limo ~[1]))
+++  test-sort-qik-02
+  %+  expect-eq
+    !>  ~["bad" "good"]
+    !>  (sort-qik (limo ~["good" "bad"]))
+++  test-sort-qik-example-00
+  %+  expect-eq
+    !>  ~[1 2 3 4]
+    !>  (sort-qik (limo ~[4 2 1 3]))
 ::  +split-at
 ++  test-split-at-00
   %+  expect-eq
@@ -1419,9 +1581,80 @@
   %+  expect-eq
     !>  ~
     !>  (try-item `(list tape)`~["aa" "bb"] 2)
-
-::  +try-pick
-
+::  +try-remove-at
+++  test-try-remove-at-00
+  %+  expect-eq
+    !>  [~ ~]
+    !>  (try-remove-at (limo ~[1]) 0)
+++  test-try-remove-at-01
+  %+  expect-eq
+    !>  [~ ~[2]]
+    !>  (try-remove-at `(list @)`[1 2 ~] 0)
+++  test-try-remove-at-02
+   %+  expect-eq
+    !>  [~ ~[1]]
+    !>  (try-remove-at `(list @)`[1 2 ~] 1)
+++  test-try-remove-at-03
+  %+  expect-eq
+    !>  ~
+    !>  (try-remove-at ~ 0)
+++  test-try-remove-at-04
+  %+  expect-eq
+    !>  ~
+    !>  (try-remove-at (limo ~[1]) 1)
+++  test-try-remove-at-example-00
+  %+  expect-eq
+    !>  [~ "good day urbit!"]
+    !>  (try-remove-at "good day, urbit!" 8)
+++  test-try-remove-at-example-01
+  %+  expect-eq
+    !>  [~ ~[1 2 4]]
+    !>  (try-remove-at `(list @)`[1 2 3 4 ~] 2)
+::  +try-remove-many-at
+++  test-try-remove-many-at-00
+  %+  expect-eq
+    !>  [~ ~]
+    !>  (try-remove-many-at ~ [0 0])
+++  test-try-remove-many-at-02
+  %+  expect-eq
+    !>  [~ ~[1]]
+    !>  (try-remove-many-at (limo ~[1]) [0 0])
+++  test-try-remove-many-at-03
+  %+  expect-eq
+    !>  [~ ~[1]]
+    !>  (try-remove-many-at (limo ~[1]) [1 0])
+++  test-try-remove-many-at-04
+  %+  expect-eq
+    !>  [~ ~]
+    !>  (try-remove-many-at (limo ~[1]) [0 1])
+++  test-try-remove-many-at-05
+   %+  expect-eq
+    !>  [~ ~[1 2 5]]
+    !>  (try-remove-many-at `(list @)`[1 2 3 4 5 ~] [2 2])
+++  test-try-remove-many-at-06
+  %+  expect-eq
+    !>  [~ ~[1 2 3 4 5]]
+    !>  (try-remove-many-at `(list @)`[1 2 3 4 5 ~] [2 0])
+++  test-try-remove-many-at-07
+  %+  expect-eq
+    !>  ~
+    !>  (try-remove-many-at ~ [0 1])
+++  test-try-remove-many-at-08
+  %+  expect-eq
+    !>  ~
+    !>  (try-remove-many-at ~ [1 0])
+++  test-try-remove-many-at-09
+  %+  expect-eq
+    !>  ~
+    !>  (try-remove-many-at (limo ~[1]) [0 2])
+++  test-try-remove-many-at-example-00
+  %+  expect-eq
+    !>  [~ "good urbit!"]
+    !>  (try-remove-many-at "good day, urbit!" [4 5])
+++  test-try-remove-many-at-example-01
+  %+  expect-eq
+    !>  [~ ~[1 2]]
+    !>  (try-remove-many-at `(list @)`[1 2 3 4 ~] [2 2])
 ::  +try-search
 ++  test-try-search-00
   %+  expect-eq
@@ -1464,6 +1697,27 @@
   %+  expect-eq
     !>  `30
     !>  (try-search-back (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+::  +try-search-by-unit
+++  test-try-search-by-unit-00
+  %+  expect-eq
+    !>  `2
+    !>  (try-search-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-try-search-by-unit-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-search-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-try-search-by-unit-02
+  %+  expect-eq
+    !>  ~
+    !>  (try-search-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-try-search-by-unit-example-00
+  %+  expect-eq
+    !>  `2
+    !>  (try-search-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-try-search-by-unit-example-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-search-by-unit (limo ~[1 3]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
 ::  +try-search-index
 ++  test-try-search-index-00
   %+  expect-eq
