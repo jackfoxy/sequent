@@ -1507,9 +1507,37 @@
     !>  (split-at (limo ~[1 2 3 4 5]) 2)
 
 ::  +split-into
+
 ::  +sum
+++  test-sum-00
+  %+  expect-eq
+    !>  0
+    !>  (sum `(list @)`~)
+++  test-sum-01
+  %+  expect-eq
+    !>  1
+    !>  (sum (limo ~[1]))
+++  test-sum-02
+  %+  expect-eq
+    !>  0
+    !>  (sum (limo ~[~ ~]))
+++  test-sum-example-00
+  %+  expect-eq
+    !>  6
+    !>  (sum (limo ~[1 2 3]))
 ::  +sum-by
-::
+++  test-sum-by-00
+  %+  expect-eq
+    !>  0
+    !>  (sum-by `(list tape)`~ |=(a=tape (lent a)))
+++  test-sum-by-01
+  %+  expect-eq
+    !>  1
+    !>  (sum-by (limo ~["a"]) |=(a=tape (lent a)))
+++  test-sum-by-example-00
+  %+  expect-eq
+    !>  6
+    !>  (sum-by (limo ~["a" "bb" "ccc"]) |=(a=tape (lent a)))
 ::  +tail-end
 ++  test-tail-end-00
   %+  expect-eq
