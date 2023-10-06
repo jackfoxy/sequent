@@ -1879,23 +1879,6 @@
   %+  expect-eq
     !>  ~[2 11 4]
     !>  (update-at (limo ~[2 3 4]) 1 11)
-::  +where
-++  test-where-00
-  %+  expect-eq
-    !>  ~
-    !>  (where `(list @)`~ |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
-++  test-where-01
-  %+  expect-eq
-    !>  ~[2]
-    !>  (where (limo ~[2]) |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
-++  test-where-02
-  %+  expect-eq
-    !>  ~
-    !>  (where (limo ~[1]) |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
-++  test-where-example-00
-  %+  expect-eq
-    !>  ~[2 8]
-    !>  (where (limo ~[2 1 8]) |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
 ::  +windowed
 ++  test-windowed-00
   %+  expect-eq

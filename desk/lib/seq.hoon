@@ -1195,7 +1195,7 @@
   (sort a |=([a=* b=*] (aor b a)))
 ::    +sort-qik: (list T) -> (list T)
 ::
-::  Sorts the given list using Operators.compare.
+::  Sorts the given list in ascending order using Operators.compare.
 ::    Examples
 ::      > (sort-qik (limo ~[4 2 1 3]))
 ::      ~[1 2 3 4]
@@ -1423,7 +1423,7 @@
   $(b t.b, i (dec i))
 ::    +try-tail: (list T) -> (unit (list T))
 ::
-::  Returns the elements of the list after the first, or None if the list is empty.
+::  Returns the elements of the list after the first.
 ::    Examples
 ::      > (try-tail ~[1 2])
 ::      `~[2]
@@ -1513,21 +1513,6 @@
   |*  [a=(list) b=@ c=*]
   ?:  (gte b (lent a))  ~|('not found' !!)
   (snap a b c)
-::    +where: [(list T) predicate:$-(T ?)] -> (list T)
-::
-::  Returns a new list containing only the elements of the list for which the
-::  given predicate returns "true"
-::    Examples
-::      > (where (limo ~[2 1 8]) |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
-::      ~[2 8]
-::    Source
-++  where
-  |*  [a=(list) predicate=$-(* ?)]
-  =/  b=(list _?>(?=(^ a) i.a))  ~
-  |-  ^-  (list _?>(?=(^ a) i.a))
-  ?~  a  (flop b)
-  ?.  (predicate i.a)  $(a t.a)
-  $(a t.a, b [i.a b])
 ::    +windowed: [(list T) window-size:@] -> (list (list T))
 ::
 ::  Returns a list of sliding windows containing elements drawn from the input
