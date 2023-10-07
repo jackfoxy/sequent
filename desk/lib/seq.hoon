@@ -37,7 +37,7 @@
 ::
 ::  Returns the average of the values in a non-empty list.
 ::    Examples
-::      > (average `(list @ud)`~[1 2 3 4])                                    │
+::      > (average `(list @ud)`~[1 2 3 4])
 ::      2
 ::    Source
 ++  average
@@ -154,7 +154,10 @@
 ::  list yielding unique keys and their number of occurrences in the original
 ::  list.
 ::    Examples
-::      > (count-by:seq (limo ~["where" "when" "there" "then"]) |=(a=tape (first-n:seq 2 a)))
+::      > %:  count-by
+::            (limo ~["where" "when" "there" "then"])
+::            |=(a=tape (scag 2 a))
+::            ==
 ::      ~[[[i=t' t="h"] 2] [[i='w' t="h"] 2]]
 ::    Source
 ++  count-by
@@ -165,7 +168,10 @@
   =/  key=_?>(?=(^ p) (q i.p))  (q i.p)
   =/  val  (~(get by res) key)
   ?~  val  $(res `(map _?>(?=(^ p) (q i.p)) @ud)`(~(put by res) key 1), p t.p)
-  $(res `(map _?>(?=(^ p) (q i.p)) @ud)`(~(put by res) key +(`@ud`(need val))), p t.p)
+  %=  $
+    res  `(map _?>(?=(^ p) (q i.p)) @ud)`(~(put by res) key +(`@ud`(need val)))
+    p    t.p
+  ==
 ::    +distinct: (list) -> (list)
 ::
 ::  Returns a list that contains no duplicate entries according to generic hash
@@ -231,7 +237,10 @@
 ::  appear in the items-to-exclude list, using generic hash and equality
 ::  comparisons to compare values.
 ::    Examples
-::      > (except (limo ~["able" "baker" "charlie" "dog"]) (limo ~["baker" "dog"]))
+::      > %:  except
+::            (limo ~["able" "baker" "charlie" "dog"]) 
+::            (limo ~["baker" "dog"])
+::        ==
 ::      ~[[i='a' t="ble"] [i='c' t="harlie"]]
 ::    Source
 ++  except
@@ -284,6 +293,211 @@
 ::      [i=2 t=~[3]]
 ::    Source
 ++  filter  skim
+::
+::    +findx: [(list T) predicate:$-(T ?)] -> T
+::
+::  Returns the first element for which the given function returns True. 
+::  Crashes if no such element exists.
+::    Examples
+::      > (findx (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+::      15
+::    Crash
+::      'not found'
+::    Source
+++  findx
+  |*  [a=(list) b=$-(* ?)]
+  |-  ^-  _?>(?=(^ a) i.a)
+  ?~  a  ~|('not found' !!)
+  ?:  (b i.a)  i.a  $(a t.a)
+::    +find-all: [(list T) predicate:$-(T ?)] -> (list T))
+::
+::  Returns all elements for which the given function returns True. 
+::  Crashes if no such element exists.
+::    Examples
+::      > (find-all (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+::      ~[15 30]
+::    Crash
+::      'not found'
+::    Source
+++  find-all
+  |*  [a=(list) b=$-(* ?)]
+  =/  c=(list _?>(?=(^ a) i.a))  ~
+  |-
+  ?~  a  ?~  c  ~|('not found' !!)  (flop c)
+  ?:  (b i.a)  $(a t.a, c [i.a c])  $(a t.a)
+::    +find-all-by-list: [(list T) arg:(list T) -> (list @)]
+::
+::  Produces list of indices of all occurrences of the argument list sequence in
+::  the sequence of the source list.
+::    Examples
+::      > (find-all-by-list "cbabab" "ba")
+::      ~[1 3]
+::    Source
+++  find-all-by-list
+  |*  [hstk=(list) nedl=(list)]
+  ^-  (list @)
+  (fand nedl hstk)
+::    +find-all-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> (list T2)
+::
+::  Applies the given function to successive elements, returning the list of
+::  elements where the function returns Some(x). 
+::  Crashes when no such element exists.
+::    Examples
+::      >  %:  find-all-by-unit
+::             (limo ~[1 2 3 4])
+::             |=(a=@ ?:(=((mod a 2) 0) `a ~))
+::            ==
+::      ~[2 4]
+::    Crash
+::      'not found'
+::    Source
+++  find-all-by-unit
+  |*  [hstk=(list) nedl=$-(* (unit *))]
+  =/  b=(list _?>(?=(^ hstk) i.hstk))  ~
+  |-  ^-  (list _?>(?=(^ hstk) i.hstk))
+  ?~  hstk  ?~  b  ~|('not found' !!)
+  (flop b)
+  =/  x  (nedl i.hstk)
+  ?~  x  $(hstk t.hstk)
+  $(hstk t.hstk, b [(need x) b])
+::    +find-back: [(list T) predicate:$-(T ?)] -> T
+::
+::  Returns the last element for which the given function returns True. 
+::  Crashes if no such element exists.
+::    Examples
+::      > %:  find-back:seq
+::            (gulf [1 30])
+::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+::        ==
+::      30
+::    Crash
+::      'not found'
+::    Source
+++  find-back
+  |*  [a=(list) b=$-(* ?)]
+  ?~  a  ~|('not found' !!)
+  (findx (flop a) b)
+::    +find-back-by-list: [(list T) arg:(list T)] -> @
+::
+::  Produces the index of the last occurrence of the argument list sequence in
+::  the sequence of the source list.
+::    Examples
+::      > (find-back-by-list "cbabab" "ba")
+::      3
+::    Source
+++  find-back-by-list
+  |*  [hstk=(list) nedl=(list)]
+  (tail-end (find-all-by-list hstk nedl))
+::    +find-back-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> T2
+::
+::  Applies the given function to successive elements from the end back, 
+::  returning the first result where function returns Some(x) for some x.
+::  Crashes when no such element exists.
+::    Examples
+::      >  %:  find-back-by-unit:seq
+::             (limo ~[1 2 3 4])
+::             |=(a=@ ?:(=((mod a 2) 0) `a ~))
+::          ==
+::      4
+::    Crash
+::      'not found'
+::    Source
+++  find-back-by-unit
+  |*  [hstk=(list) nedl=$-(* (unit *))]
+  ^-  _?>(?=(^ hstk) i.hstk)
+  (find-by-unit (flop hstk) nedl)
+::    +find-by-list: [(list T) arg:(list T)] -> @
+::
+::  Produces the index of the first occurrence of the argument list sequence in
+::  the sequence of the source list.
+::    Examples
+::      > (find-by-list "cbabab" "ab")
+::      2
+::    Crash
+::      'not found'
+::    Source
+++  find-by-list
+  |*  [hstk=(list) nedl=(list)]
+  ^-  @
+  =/  x  (find nedl hstk)
+  ?~  x  ~|('not found' !!)  (need x)
+::    +find-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> T2
+::
+::  Applies the given function to successive elements, returning the first
+::  result where function returns Some(x) for some x. Crashes when no such
+::  element exists.
+::    Examples
+::      >  (find-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+::      2
+::    Crash
+::      'not found'
+::    Source
+++  find-by-unit
+  |*  [hstk=(list) nedl=$-(* (unit *))]
+  |-  ^-  _?>(?=(^ hstk) i.hstk)
+  ?~  hstk  ~|('not found' !!)
+  =/  x  (nedl i.hstk)
+  ?~  x  $(hstk t.hstk)
+  (need x)
+::    +find-index: [(list T) predicate:$-(T ?)] -> @
+::
+::  Returns the index of the first element in the list that satisfies the given
+::  predicate. Crashes if no such element exists.
+::    Examples
+::      > %:  find-index:seq
+::            (gulf [1 30])
+::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+::        ==
+::      14
+::    Crash
+::      'not found'
+::    Source
+++  find-index
+  |*  [a=(list) b=$-(* ?)]
+  =/  i  0
+  |-  ^-  @
+  ?~  a  ~|('not found' !!)
+  ?:  (b i.a)  i  $(a t.a, i +(i))
+::    +find-index-all: [(list T) predicate:$-(T ?)] -> (list @)
+::
+::  Returns the list of indices in the list that satisfies the given predicate.
+::    Examples
+::      > %:  find-index-all:seq
+::            (gulf [1 30])
+::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+::          ==
+::      ~[14 29]
+::    Source
+++  find-index-all
+  |*  [a=(list) b=$-(* ?)]
+  =/  c=(list @)  ~
+  =/  i  0
+  |-  ^-  (list @)
+  ?~  a  (flop c)
+  ?:  (b i.a)  $(a t.a, c [i c], i +(i))  $(a t.a, i +(i))
+::    +find-index-back: [(list T) predicate:$-(T ?)] -> @
+::
+::  Returns the index of the last element in the list that satisfies the given
+::  predicate. Crashes if no such element exists.
+::    Examples
+::      > %:  find-index-back
+::            (gulf [1 30])
+::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+::        ==
+::      29
+::    Crash
+::      'not found'
+::    Source
+++  find-index-back
+  |*  [a=(list) c=$-(* ?)]
+  ?~  a  ~|('not found' !!)
+  =/  b  (flop a)
+  =/  i  (dec (lent a))
+  |-  ^-  @ud
+  ?~  b  ~|('not found' !!)
+  ?:  (c i.b)  i  
+  ?:  =(0 i)  ~|('not found' !!)
+  $(b t.b, i (dec i))
 ::    +first-n: [(list T) count:@ud] -> (list T)
 ::
 ::  Returns the first N elements of the list.
@@ -320,7 +534,12 @@
 ::  identical sizes. If the input function is f and the elements are i0...iN and
 ::  j0...jN then computes f (... (f s i0 j0)...) iN jN.
 ::    Examples
-::      > (fold2 (limo ~["Tails" "Head" "Tails"]) (limo ~["Tails" "Head" "Head"]) 0 |=([n1=tape n2=tape state=@] ?:(=(n1 n2) +(state) state)))
+::      > %:  fold2
+::            (limo ~["Tails" "Head" "Tails"])
+::            (limo ~["Tails" "Head" "Head"])
+::            0
+::            |=([n1=tape n2=tape state=@] ?:(=(n1 n2) +(state) state))
+::          ==
 ::      2
 ::    Crash
 ::      'lists of unequal length'
@@ -341,7 +560,11 @@
 ::          ^+  state
 ::          ?~  state  (limo ~[[n 1]])
 ::          [[n +(+.i.state)] state]
-::      > (fold-back:seq (limo ~["Apple" "Pear" "Orange"]) `(list [tape @])`~ less-hungry)
+::      > %:  fold-back:seq
+::            (limo ~["Apple" "Pear" "Orange"])
+::            `(list [tape @])`~ 
+::            less-hungry
+::          ==
 ::      [i=["Apple" 3] t=~[["Pear" 2] ["Orange" 1]]]
 ::    Source
 ++  fold-back
@@ -354,7 +577,12 @@
 ::  identical sizes. If the input function is f and the elements are i0...iN and
 ::  j0...jN then computes f i0 j0 (...(f iN jN s)).
 ::    Examples
-::      > (fold-back2 (limo ~["Tails" "Head" "Tails"]) (limo ~["Tails" "Head" "Head"]) `(list tape)`~ |=([n1=tape n2=tape state=(list tape)] [(weld n1 n2) state]))
+::      > %:  fold-back2
+::            (limo ~["Tails" "Head" "Tails"])
+::            (limo ~["Tails" "Head" "Head"])
+::            `(list tape)`~ 
+::            |=([n1=tape n2=tape state=(list tape)] [(weld n1 n2) state])
+::          ==
 ::      ~["TailsTails" "HeadHead" "TailsHead"]
 ::    Source
 ++  fold-back2
@@ -380,10 +608,18 @@
 ::  Tests if all corresponding elements of the list satisfy the given
 ::  predicate pairwise. Crashes on lists of unequal length
 ::    Examples
-::      > (forall (limo ~[1 4 8]) (limo ~[3 4 8]) |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n)))
+::      > %:  forall2
+::            (limo ~[1 4 8])
+::            (limo ~[3 4 8])
+::            |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n))
+::          ==
 ::      %.y
-::      > (forall (limo ~[1 5 8]) (limo ~[3 4 8]) |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n)))
-::      %.y
+::      > %:  forall2
+::            (limo ~[1 5 8])
+::            (limo ~[3 4 8])
+::            |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n))
+::          ==
+::      %.n
 ::    Crash
 ::      'lists of unequal length'
 ::    Source
@@ -538,7 +774,11 @@
 ::  Applies the given function to two lists simultaneously, dropping the
 ::  results. The lists must have identical size.
 ::    Examples
-::      > (iter2 (limo ~["tape1" "tape2"]) (limo ~["tape3" "tape4"]) |=([a=tape b=tape] (add (lent a) (lent b))))
+::      > %:  iter2
+::            (limo ~["tape1" "tape2"])
+::            (limo ~["tape3" "tape4"])
+::            |=([a=tape b=tape] (add (lent a) (lent b)))
+::          ==
 ::      ~
 ::    Crash
 ::      'lists of unequal length'
@@ -564,7 +804,11 @@
 ::  Applies the given function to two lists and the current index,
 ::  dropping the results. The lists must have identical size.
 ::    Examples
-::      > (iteri2 (limo ~[1 2 3]) (limo ~[4 5 6]) |=([a=@ b=@ c=@] (add (add a b) c)))
+::      > %:  iteri2
+::            (limo ~[1 2 3])
+::            (limo ~[4 5 6])
+::            |=([a=@ b=@ c=@] (add (add a b) c))
+::          ==
 ::      ~
 ::    Crash
 ::      'lists of unequal length'
@@ -631,7 +875,12 @@
 ::  function to the corresponding elements of the three lists
 ::  simultaneously.
 ::    Examples
-::      > (map2 (limo ~[1 2 3 4]) (limo ~[5 6 7 8]) (limo ~[9 10 11 12]) |=(a=[@ @ @] (add (add -.a +<.a) +>.a)))
+::      > %:  map3
+::            (limo ~[1 2 3 4])
+::            (limo ~[5 6 7 8])
+::            (limo ~[9 10 11 12])
+::            |=(a=[@ @ @] (add (add -.a +<.a) +>.a))
+::          ==
 ::      ~[15 18 21 24]
 ::    Crash
 ::      'lists of unequal length'
@@ -705,7 +954,11 @@
 ::
 ::  Like mapi, but mapping corresponding elements from two lists of equal length.
 ::    Examples
-::      > (mapi2 (limo ~[1 2 3]) (limo ~[4 5 6]) |=([a=@ b=@ c=@] (add (add a b) c)))
+::      > %:  mapi2
+::            (limo ~[1 2 3])
+::            (limo ~[4 5 6])
+::            |=([a=@ b=@ c=@] (add (add a b) c))
+::          ==
 ::      ~[5 8 11]
 ::    Crash
 ::      'lists of unequal length'
@@ -933,193 +1186,7 @@
 ::    Source
 ++  scan-back  !!
 
-::
-::    +search: [(list T) predicate:$-(T ?)] -> T
-::
-::  Returns the first element for which the given function returns True. 
-::  Crashes if no such element exists.
-::    Examples
-::      > (search (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::      15
-::    Crash
-::      'not found'
-::    Source
-++  search
-  |*  [a=(list) b=$-(* ?)]
-  |-  ^-  _?>(?=(^ a) i.a)
-  ?~  a  ~|('not found' !!)
-  ?:  (b i.a)  i.a  $(a t.a)
-::    +search-all: [(list T) predicate:$-(T ?)] -> (list T))
-::
-::  Returns all elements for which the given function returns True. 
-::  Crashes if no such element exists.
-::    Examples
-::      > (search-all (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::      ~[15 30]
-::    Crash
-::      'not found'
-::    Source
-++  search-all
-  |*  [a=(list) b=$-(* ?)]
-  =/  c=(list _?>(?=(^ a) i.a))  ~
-  |-
-  ?~  a  ?~  c  ~|('not found' !!)  (flop c)
-  ?:  (b i.a)  $(a t.a, c [i.a c])  $(a t.a)
-::    +search-all-by-list: [(list T) arg:(list T) -> (list @)]
-::
-::  Produces list of indices of all occurrences of the argument list sequence in
-::  the sequence of the source list.
-::    Examples
-::      > (search-all-by-list "cbabab" "ba")
-::      ~[1 3]
-::    Source
-++  search-all-by-list
-  |*  [hstk=(list) nedl=(list)]
-  ^-  (list @)
-  (fand nedl hstk)
-::    +search-all-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> (list T2)
-::
-::  Applies the given function to successive elements, returning the list of
-::  elements where the function returns Some(x). 
-::  Crashes when no such element exists.
-::    Examples
-::      >  (search-all-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-::      ~[2 4]
-::    Crash
-::      'not found'
-::    Source
-++  search-all-by-unit
-  |*  [hstk=(list) nedl=$-(* (unit *))]
-  =/  b=(list _?>(?=(^ hstk) i.hstk))  ~
-  |-  ^-  (list _?>(?=(^ hstk) i.hstk))
-  ?~  hstk  ?~  b  ~|('not found' !!)
-  (flop b)
-  =/  x  (nedl i.hstk)
-  ?~  x  $(hstk t.hstk)
-  $(hstk t.hstk, b [(need x) b])
-::    +search-back: [(list T) predicate:$-(T ?)] -> T
-::
-::  Returns the last element for which the given function returns True. 
-::  Crashes if no such element exists.
-::    Examples
-::      > (search-back (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::      30
-::    Crash
-::      'not found'
-::    Source
-++  search-back
-  |*  [a=(list) b=$-(* ?)]
-  ?~  a  ~|('not found' !!)
-  (search (flop a) b)
-::    +search-back-by-list: [(list T) arg:(list T)] -> @
-::
-::  Produces the index of the last occurrence of the argument list sequence in
-::  the sequence of the source list.
-::    Examples
-::      > (search-back-by-list "cbabab" "ba")
-::      3
-::    Source
-++  search-back-by-list
-  |*  [hstk=(list) nedl=(list)]
-  (tail-end (search-all-by-list hstk nedl))
-::    +search-back-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> T2
-::
-::  Applies the given function to successive elements from the end back, 
-::  returning the first result where function returns Some(x) for some x.
-::  Crashes when no such element exists.
-::    Examples
-::      >  (search-back-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-::      4
-::    Crash
-::      'not found'
-::    Source
-++  search-back-by-unit
-  |*  [hstk=(list) nedl=$-(* (unit *))]
-  ^-  _?>(?=(^ hstk) i.hstk)
-  (search-by-unit (flop hstk) nedl)
-::    +search-by-list: [(list T) arg:(list T)] -> @
-::
-::  Produces the index of the first occurrence of the argument list sequence in
-::  the sequence of the source list.
-::    Examples
-::      > (search-by-list "cbabab" "ab")
-::      2
-::    Crash
-::      'not found'
-::    Source
-++  search-by-list
-  |*  [hstk=(list) nedl=(list)]
-  ^-  @
-  =/  x  (find nedl hstk)
-  ?~  x  ~|('not found' !!)  (need x)
-::    +search-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> T2
-::
-::  Applies the given function to successive elements, returning the first
-::  result where function returns Some(x) for some x. Crashes when no such
-::  element exists.
-::    Examples
-::      >  (search-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-::      2
-::    Crash
-::      'not found'
-::    Source
-++  search-by-unit
-  |*  [hstk=(list) nedl=$-(* (unit *))]
-  |-  ^-  _?>(?=(^ hstk) i.hstk)
-  ?~  hstk  ~|('not found' !!)
-  =/  x  (nedl i.hstk)
-  ?~  x  $(hstk t.hstk)
-  (need x)
-::    +search-index: [(list T) predicate:$-(T ?)] -> @
-::
-::  Returns the index of the first element in the list that satisfies the given
-::  predicate. Crashes if no such element exists.
-::    Examples
-::      > (search-index (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::      14
-::    Crash
-::      'not found'
-::    Source
-++  search-index
-  |*  [a=(list) b=$-(* ?)]
-  =/  i  0
-  |-  ^-  @
-  ?~  a  ~|('not found' !!)
-  ?:  (b i.a)  i  $(a t.a, i +(i))
-::    +search-index-all: [(list T) predicate:$-(T ?)] -> (list @)
-::
-::  Returns the list of indices in the list that satisfies the given predicate.
-::    Examples
-::      > (search-index-all (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::      ~[14 29]
-::    Source
-++  search-index-all
-  |*  [a=(list) b=$-(* ?)]
-  =/  c=(list @)  ~
-  =/  i  0
-  |-  ^-  (list @)
-  ?~  a  (flop c)
-  ?:  (b i.a)  $(a t.a, c [i c], i +(i))  $(a t.a, i +(i))
-::    +search-index-back: [(list T) predicate:$-(T ?)] -> @
-::
-::  Returns the index of the last element in the list that satisfies the given
-::  predicate. Crashes if no such element exists.
-::    Examples
-::      > (search-index-back (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::      29
-::    Crash
-::      'not found'
-::    Source
-++  search-index-back
-  |*  [a=(list) c=$-(* ?)]
-  ?~  a  ~|('not found' !!)
-  =/  b  (flop a)
-  =/  i  (dec (lent a))
-  |-  ^-  @ud
-  ?~  b  ~|('not found' !!)
-  ?:  (c i.b)  i  
-  ?:  =(0 i)  ~|('not found' !!)
-  $(b t.b, i (dec i))
+
 ::    +singleton: value: T -> (list T)
 ::
 ::  Returns a list that contains one item only.
@@ -1130,8 +1197,6 @@
 ++  singleton
   |*  a=*
   (limo ~[a])
-::
-
 ::    +skip-n: [(list T) count:@] -> (list T)
 ::
 ::  Returns the list after removing the first N elements.
@@ -1175,7 +1240,9 @@
 ::  Sorts the given list in descending order using keys given by the given
 ::  projection. Keys are compared using Operators.compare.
 ::    Examples
-::      > (sort-by-descending (limo ~["bb" "a" "dddd" "ccc"]) |=(a=tape (lent a)))
+::      > %:  sort-by-descending
+::            (limo ~["bb" "a" "dddd" "ccc"])  |=(a=tape (lent a))
+::        ==
 ::      ~["dddd" "ccc" "bb" "a"]
 ::    Source
 ++  sort-by-descending
@@ -1294,6 +1361,89 @@
   |*  a=(list)
   ?:  =(1 (lent a))  `-.a
   ~
+::    +try-find: [(list T) predicate:$-(T ?)] -> (unit T)
+::
+::  Returns the first element for which the given function returns True.
+::  Return None if no such element exists.
+::    Examples
+::      > (try-find (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+::      `15
+::    Source
+++  try-find
+  |*  [a=(list) b=$-(* ?)]
+  |-  ^-  (unit _?>(?=(^ a) i.a))
+  ?~  a  ~
+  ?:  (b i.a)  `i.a  $(a t.a)
+::    +try-find-back: [(list T) predicate:$-(T ?)] -> (unit T)
+::
+::  Returns the last element for which the given function returns True.
+::  Return None if no such element exists.
+::    Examples
+::      > %:  try-find-back:seq
+::            (gulf [1 30])
+::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+::        ==
+::      `30
+::    Source
+++  try-find-back
+  |*  [a=(list) b=$-(* ?)]
+  ?~  a  ~
+  (try-find (flop a) b)
+::    +try-find-by-unit: [(list T) chooser:$-(T (unit T))] -> (unit T)
+::
+::  Applies the given function to successive elements, returning Some(x) for the
+::  first result where function returns Some(x).
+::  If no such element exists then return None.
+::    Examples
+::      >  (search-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+::      `2
+::    Crash
+::      'not found'
+::    Source
+++  try-find-by-unit
+  |*  [hstk=(list) nedl=$-(* (unit *))]
+  |-  ^-  (unit _?>(?=(^ hstk) i.hstk))
+  ?~  hstk  ~
+  =/  x  (nedl i.hstk)
+  ?~  x  $(hstk t.hstk)  x
+::    +try-find-index: [(list T) predicate:$-(T ?)] -> (unit @)
+::
+::  Returns the index of the first element in the list that satisfies the given
+::  predicate. Return None if no such element exists.
+::    Examples
+::      > %:  try-find-index:seq
+::            (gulf [1 30])
+::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+::          ==
+::      `14
+::    Source
+++  try-find-index
+  |*  [a=(list) b=$-(* ?)]
+  =/  i  0
+  |-  ^-  (unit @)
+  ?~  a  ~
+  ?:  (b i.a)  `i  $(a t.a, i +(i))
+::    +try-find-index-back: [(list T) predicate:$-(T ?)] -> (unit @)
+::
+::  Returns the index of the last element in the list that satisfies the given
+::  predicate. Return None if no such element exists.
+::    Examples
+::    > %:  try-find-index-back:seq
+::          (gulf [1 30])
+::          |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+::        ==
+::    `29
+::    Source
+++  try-find-index-back
+  |*  [a=(list) c=$-(* ?)]
+  ?~  a  ~
+  =/  b  (flop a)
+  =/  i  (dec (lent a))
+  |-  ^-  (unit @ud)
+  ?~  b  ~
+  ?:  (c i.b)  `i  
+  ?:  =(0 i)  ~
+  $(b t.b, i (dec i))
 ::    +try-head: (list T) -> (unit T)
 ::
 ::  Returns the first element of the list, or None if the list is empty.
@@ -1347,80 +1497,6 @@
   |*  [a=(list) i=@ c=@]
   ?:  (gth (add i c) (lent a))  ~
   `(oust [i c] a)
-::    +try-search: [(list T) predicate:$-(T ?)] -> (unit T)
-::
-::  Returns the first element for which the given function returns True.
-::  Return None if no such element exists.
-::    Examples
-::      > (try-search (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::      `15
-::    Source
-++  try-search
-  |*  [a=(list) b=$-(* ?)]
-  |-  ^-  (unit _?>(?=(^ a) i.a))
-  ?~  a  ~
-  ?:  (b i.a)  `i.a  $(a t.a)
-::    +try-search-back: [(list T) predicate:$-(T ?)] -> (unit T)
-::
-::  Returns the last element for which the given function returns True.
-::  Return None if no such element exists.
-::    Examples
-::      > (try-search-back (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::      `30
-::    Source
-++  try-search-back
-  |*  [a=(list) b=$-(* ?)]
-  ?~  a  ~
-  (try-search (flop a) b)
-::    +try-search-by-unit: [(list T) chooser:$-(T (unit T))] -> (unit T)
-::
-::  Applies the given function to successive elements, returning Some(x) for the
-::  first result where function returns Some(x).
-::  If no such element exists then return None.
-::    Examples
-::      >  (search-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-::      `2
-::    Crash
-::      'not found'
-::    Source
-++  try-search-by-unit
-  |*  [hstk=(list) nedl=$-(* (unit *))]
-  |-  ^-  (unit _?>(?=(^ hstk) i.hstk))
-  ?~  hstk  ~
-  =/  x  (nedl i.hstk)
-  ?~  x  $(hstk t.hstk)  x
-::    +try-search-index: [(list T) predicate:$-(T ?)] -> (unit @)
-::
-::  Returns the index of the first element in the list that satisfies the given
-::  predicate. Return None if no such element exists.
-::    Examples
-::      > (try-search-index (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::      `14
-::    Source
-++  try-search-index
-  |*  [a=(list) b=$-(* ?)]
-  =/  i  0
-  |-  ^-  (unit @)
-  ?~  a  ~
-  ?:  (b i.a)  `i  $(a t.a, i +(i))
-::    +try-search-index-back: [(list T) predicate:$-(T ?)] -> (unit @)
-::
-::  Returns the index of the last element in the list that satisfies the given
-::  predicate. Return None if no such element exists.
-::    Examples
-::    > (try-search-index-back (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::    `29
-::    Source
-++  try-search-index-back
-  |*  [a=(list) c=$-(* ?)]
-  ?~  a  ~
-  =/  b  (flop a)
-  =/  i  (dec (lent a))
-  |-  ^-  (unit @ud)
-  ?~  b  ~
-  ?:  (c i.b)  `i  
-  ?:  =(0 i)  ~
-  $(b t.b, i (dec i))
 ::    +try-tail: (list T) -> (unit (list T))
 ::
 ::  Returns the elements of the list after the first.
@@ -1533,7 +1609,8 @@
   =/  pp=(list _?>(?=(^ p) i.p))  p
   |-  ^-  (list (list _?>(?=(^ p) i.p)))
   ?~  p  ~|('empty list' !!)
-  ?~  pp  ?:  (lth (lent sub-tree) q)  ?~  b  ~|('list shorter than window' !!)  (flop b)
+  ?~  pp  ?:  (lth (lent sub-tree) q)  
+      ?~  b  ~|('list shorter than window' !!)  (flop b)
   $(pp t.p, b [(flop sub-tree) b], sub-tree ~)
   ?:  =((lent sub-tree) q)
     $(p t.p, pp t.p, b [(flop sub-tree) b], sub-tree ~)
@@ -1560,7 +1637,11 @@
 ::  Combines the three lists into a list of triples. The lists must have equal
 ::  lengths.
 ::    Examples
-::      > (zip3 `(list @)`~[1 2] `(list tape)`~["aa" "bb"] `(list @t)`~['a' 'b'])
+::      > %:  zip3:seq
+::            `(list @)`~[1 2]
+::            `(list tape)`~["aa" "bb"]
+::            `(list @t)`~['a' 'b']
+::          ==
 ::      ~[[1 "aa" 'a'] [2 "bb" 'b']]
 ::    Crash
 ::      'lists of unequal length'

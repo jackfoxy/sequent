@@ -239,7 +239,10 @@
 ++  test-count-by-example-00
   %+  expect-eq
     !>  ~[[[i='t' t="h"] 2] [[i='w' t="h"] 2]]
-    !>  (count-by (limo ~["where" "when" "there" "then"]) |=(a=tape (scag 2 a)))
+    !>  %:  count-by
+            (limo ~["where" "when" "there" "then"])
+            |=(a=tape (scag 2 a))
+        ==
 ::
 ::  +distinct
 ++  test-distinct-00
@@ -315,7 +318,10 @@
 ++  test-except-example-00
   %+  expect-eq
     !>  ~[[i='a' t="ble"] [i='c' t="harlie"]]
-    !>  (except (limo ~["able" "baker" "charlie" "dog"]) (limo ~["baker" "dog"]))
+    !>  %:  except
+            (limo ~["able" "baker" "charlie" "dog"]) 
+            (limo ~["baker" "dog"])
+        ==
 ::  +exists
 ++  test-exists-00
   %+  expect-eq
@@ -397,6 +403,238 @@
   %+  expect-eq
     !>  [i=2 t=~[3]]
     !>  (filter `(list @)`[0 1 2 3 ~] |=(a=@ (gth a 1)))
+::  +findx
+++  test-findx-00
+  %+  expect-eq
+    !>  15
+    !>  (findx (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-findx-fail-00
+  %-  expect-fail
+  |.  (findx (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-findx-fail-01
+  %-  expect-fail
+  |.  (findx (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-findx-fail-02
+  %-  expect-fail
+  |.  (findx (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-findx-example-00
+  %+  expect-eq
+    !>  15
+    !>  (findx (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+::  +find-all
+++  test-find-all-00
+  %+  expect-eq
+    !>  ~[15]
+    !>  (find-all (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-all-fail-00
+  %-  expect-fail
+  |.  (find-all `(list @)`~ |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-all-fail-01
+  %-  expect-fail
+  |.  (find-all (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-all-fail-02
+  %-  expect-fail
+  |.  (find-all (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-all-example-00
+  %+  expect-eq
+    !>  ~[15 30]
+    !>  (find-all (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+::  +find-all-by-list
+++  test-find-all-by-list-00
+  %+  expect-eq
+    !>  ~
+    !>  (find-all-by-list `tape`~ "ba")
+++  test-find-all-by-list-01
+  %+  expect-eq
+    !>  ~
+    !>  (find-all-by-list "cbabab" `tape`~)
+++  test-find-all-by-list-02
+  %+  expect-eq
+    !>  ~[0]
+    !>  (find-all-by-list "b" "b")
+++  test-find-all-by-list-03
+  %+  expect-eq
+    !>  ~[0]
+    !>  (find-all-by-list "ba" "ba")
+++  test-find-all-by-list-example-00
+  %+  expect-eq
+    !>  ~[1 3]
+    !>  (find-all-by-list "cbabab" "ba")
+::  +find-all-by-unit
+++  test-find-all-by-unit-00
+  %+  expect-eq
+    !>  ~[2]
+    !>  (find-all-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-find-all-by-unit-fail-00
+  %-  expect-fail
+  |.  (find-all-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-find-all-by-unit-fail-01
+  %-  expect-fail
+  |.  (find-all-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-find-all-by-unit-example-00
+  %+  expect-eq
+    !>  ~[2 4]
+    !>  %:  find-all-by-unit
+            (limo ~[1 2 3 4])
+            |=(a=@ ?:(=((mod a 2) 0) `a ~))
+        ==
+::  +find-back
+++  test-find-back-00
+  %+  expect-eq
+    !>  15
+    !>  (find-back (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-back-fail-00
+  %-  expect-fail
+  |.  (find-back (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-back-fail-01
+  %-  expect-fail
+  |.  (find-back (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-back-fail-02
+  %-  expect-fail
+  |.  (find-back (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-back-example-00
+  %+  expect-eq
+    !>  30
+    !>  %:  find-back
+            (gulf [1 30])
+            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+        ==
+::  +find-back-by-list
+++  test-find-back-by-list-00
+  %+  expect-eq
+    !>  0
+    !>  (find-back-by-list "ba" "ba")
+++  test-find-back-by-list-fail-00
+  %-  expect-fail
+  |.  (find-back-by-list "cbabab" ~)
+++  test-find-back-by-list-fail-01
+  %-  expect-fail
+  |.  (find-back-by-list ~ "ba")
+++  test-find-back-by-list-example-00
+  %+  expect-eq
+    !>  3
+    !>  (find-back-by-list "cbabab" "ba")
+::  +find-back-by-unit
+++  test-find-back-by-unit-00
+  %+  expect-eq
+    !>  2
+    !>  (find-back-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-find-back-by-unit-fail-00
+  %-  expect-fail
+  |.  (find-back-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-find-back-by-unit-fail-01
+  %-  expect-fail
+  |.  (find-back-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-find-back-by-unit-example-00
+  %+  expect-eq
+    !>  4
+    !>  %:  find-back-by-unit
+            (limo ~[1 2 3 4])
+            |=(a=@ ?:(=((mod a 2) 0) `a ~))
+        ==
+::  +find-by-list
+++  test-find-by-list-00
+  %+  expect-eq
+    !>  0
+    !>  (find-by-list `(list @)`~[1] `(list @)`~[1])
+++  test-find-by-list-01
+  %+  expect-eq
+    !>  0
+    !>  (find-by-list `(list @)`~[1 2] `(list @)`~[1 2])
+++  test-find-by-list-02
+  %+  expect-eq
+    !>  3
+    !>  (find-by-list `(list @)`~[1 2 3 4 5] `(list @)`~[4 5])
+++  test-find-by-list-fail-00
+  %-  expect-fail
+  |.  (find-by-list `(list @)`~ `(list @)`~[2 3])
+++  test-find-by-list-fail-01
+  %-  expect-fail
+  |.  (find-by-list `(list @)`~[1 2 3 4 5] `(list @)`~)
+++  test-find-by-list-fail-02
+  %-  expect-fail
+  |.  (find-by-list `(list @)`~[1 2 3 4 5] `(list @)`~[4 6])
+++  test-find-by-list-example-00
+  %+  expect-eq
+    !>  2
+    !>  (find-by-list "cbabab" "ab")
+::  +find-by-unit
+++  test-find-by-unit-00
+  %+  expect-eq
+    !>  2
+    !>  (find-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-find-by-unit-fail-00
+  %-  expect-fail
+  |.  (find-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-find-by-unit-fail-01
+  %-  expect-fail
+  |.  (find-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-find-by-unit-example-00
+  %+  expect-eq
+    !>  2
+    !>  (find-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+::  +find-index
+++  test-find-index-00
+  %+  expect-eq
+    !>  0
+    !>  (find-index (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-fail-00
+  %-  expect-fail
+  |.  (find-index (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-fail-01
+  %-  expect-fail
+  |.  (find-index (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-fail-02
+  %-  expect-fail
+  |.  (find-index (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-example-00
+  %+  expect-eq
+    !>  14
+    !>  %:  find-index
+            (gulf [1 30])
+            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+        ==
+::  +find-index-all
+++  test-find-index-all-00
+  %+  expect-eq
+    !>  ~
+    !>  (find-index-all `(list @)`~ |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-all-01
+  %+  expect-eq
+    !>  ~
+    !>  (find-index-all `(list @)`~[1] |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-all-02
+  %+  expect-eq
+    !>  ~[0]
+    !>  (find-index-all `(list @)`~[15] |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-all-example-00
+  %+  expect-eq
+    !>  ~[14 29]
+    !>  %:  find-index-all
+            (gulf [1 30])
+            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+        ==
+::  +find-index-back
+++  test-find-index-back-00
+  %+  expect-eq
+    !>  0
+    !>  (find-index-back (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-back-fail-00
+  %-  expect-fail
+  |.  (find-index-back (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-back-fail-01
+  %-  expect-fail
+  |.  (find-index-back (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-back-fail-02
+  %-  expect-fail
+  |.  (find-index-back (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-find-index-back-example-00
+  %+  expect-eq
+    !>  29
+    !>  %:  find-index-back
+            (gulf [1 30])
+            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+        ==
 ::  +first-n
 ++  test-first-n-00
   %+  expect-eq
@@ -458,7 +696,12 @@
 ++  test-fold2-example-00
   %+  expect-eq
     !>  2
-    !>  (fold2 (limo ~["Tails" "Head" "Tails"]) (limo ~["Tails" "Head" "Head"]) 0 |=([n1=tape n2=tape state=@] ?:(=(n1 n2) +(state) state)))
+    !>  %:  fold2
+            (limo ~["Tails" "Head" "Tails"])
+            (limo ~["Tails" "Head" "Head"])
+            0
+            |=([n1=tape n2=tape state=@] ?:(=(n1 n2) +(state) state))
+        ==
 ::  +fold-back
 ++  test-fold-back-00
   %+  expect-eq
@@ -476,7 +719,11 @@
 ++  test-fold-back-example-00
   %+  expect-eq
     !>  [i=["Apple" 3] t=~[["Pear" 2] ["Orange" 1]]]
-    !>  (fold-back (limo ~["Apple" "Pear" "Orange"]) `(list [tape @])`~ less-hungry)
+    !>  %:  fold-back
+            (limo ~["Apple" "Pear" "Orange"])
+            `(list [tape @])`~ 
+            less-hungry
+        ==
 ::  +fold-back2
 ++  test-fold-back2-00
   %+  expect-eq
@@ -499,7 +746,12 @@
 ++  test-fold-back2-example-00
   %+  expect-eq
     !>  ~["TailsTails" "HeadHead" "TailsHead"]
-    !>  (fold-back2 (limo ~["Tails" "Head" "Tails"]) (limo ~["Tails" "Head" "Head"]) `(list tape)`~ |=([n1=tape n2=tape state=(list tape)] [(weld n1 n2) state]))
+    !>  %:  fold-back2
+            (limo ~["Tails" "Head" "Tails"])
+            (limo ~["Tails" "Head" "Head"])
+            `(list tape)`~ 
+            |=([n1=tape n2=tape state=(list tape)] [(weld n1 n2) state])
+        ==
 ::  +forall
 ++  test-forall-00
   %+  expect-eq
@@ -543,11 +795,19 @@
 ++  test-forall2-example-00
   %+  expect-eq
     !>  %.y
-    !>  (forall2 (limo ~[1 4 8]) (limo ~[3 4 8]) |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n)))
+    !>  %:  forall2
+            (limo ~[1 4 8])
+            (limo ~[3 4 8])
+            |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n))
+        ==
 ++  test-forall2-example-01
   %+  expect-eq
     !>  %.n
-    !>  (forall2 (limo ~[1 5 8]) (limo ~[3 4 8]) |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n)))
+    !>  %:  forall2
+            (limo ~[1 5 8])
+            (limo ~[3 4 8])
+            |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n))
+        ==
 ::  +get-head
 ++  test-get-head-00
   %+  expect-eq
@@ -728,7 +988,11 @@
 ++  test-iter2-example-00
   %+  expect-eq
     !>  ~
-    !>  (iter2 (limo ~["tape1" "tape2"]) (limo ~["tape3" "tape4"]) |=([a=tape b=tape] (add (lent a) (lent b))))
+    !>  %:  iter2
+            (limo ~["tape1" "tape2"])
+            (limo ~["tape3" "tape4"])
+            |=([a=tape b=tape] (add (lent a) (lent b)))
+        ==
 ::  +iteri
 ++  test-iteri-00
   %+  expect-eq
@@ -760,7 +1024,11 @@
 ++  test-iteri2-example-00
   %+  expect-eq
     !>  ~
-    !>  (iteri2 (limo ~[1 2 3]) (limo ~[4 5 6]) |=([a=@ b=@ c=@] (add (add a b) c)))
+    !>  %:  iteri2
+            (limo ~[1 2 3])
+            (limo ~[4 5 6])
+            |=([a=@ b=@ c=@] (add (add a b) c))
+        ==
 ::  +last-n
 ++  test-last-n-00
   %+  expect-eq
@@ -861,7 +1129,12 @@
 ++  test-map3-example-00
   %+  expect-eq
     !>  ~[15 18 21 24]
-    !>  (map3 (limo ~[1 2 3 4]) (limo ~[5 6 7 8]) (limo ~[9 10 11 12]) |=(a=[@ @ @] (add (add -.a +<.a) +>.a)))
+    !>  %:  map3
+            (limo ~[1 2 3 4])
+            (limo ~[5 6 7 8])
+            (limo ~[9 10 11 12])
+            |=(a=[@ @ @] (add (add -.a +<.a) +>.a))
+        ==
 ::  +map-fold
 ++  map-fold-foo
   |*  [p=[@t @] state=@]
@@ -924,7 +1197,11 @@
 ++  test-mapi2-example-00
   %+  expect-eq
     !>  ~[5 8 11]
-    !>  (mapi2 (limo ~[1 2 3]) (limo ~[4 5 6]) |=([a=@ b=@ c=@] (add (add a b) c)))
+    !>  %:  mapi2
+            (limo ~[1 2 3])
+            (limo ~[4 5 6])
+            |=([a=@ b=@ c=@] (add (add a b) c))
+        ==
 ::  +maxi
 ++  test-maxi-00
   %+  expect-eq
@@ -1158,220 +1435,7 @@
 ::  +scan
 ::  +scan-back
 ::
-::  +search
-++  test-search-00
-  %+  expect-eq
-    !>  15
-    !>  (search (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-fail-00
-  %-  expect-fail
-  |.  (search (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-fail-01
-  %-  expect-fail
-  |.  (search (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-fail-02
-  %-  expect-fail
-  |.  (search (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-example-00
-  %+  expect-eq
-    !>  15
-    !>  (search (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::  +search-all
-++  test-search-all-00
-  %+  expect-eq
-    !>  ~[15]
-    !>  (search-all (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-all-fail-00
-  %-  expect-fail
-  |.  (search-all `(list @)`~ |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-all-fail-01
-  %-  expect-fail
-  |.  (search-all (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-all-fail-02
-  %-  expect-fail
-  |.  (search-all (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-all-example-00
-  %+  expect-eq
-    !>  ~[15 30]
-    !>  (search-all (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::  +search-all-by-list
-++  test-search-all-by-list-00
-  %+  expect-eq
-    !>  ~
-    !>  (search-all-by-list `tape`~ "ba")
-++  test-search-all-by-list-01
-  %+  expect-eq
-    !>  ~
-    !>  (search-all-by-list "cbabab" `tape`~)
-++  test-search-all-by-list-02
-  %+  expect-eq
-    !>  ~[0]
-    !>  (search-all-by-list "b" "b")
-++  test-search-all-by-list-03
-  %+  expect-eq
-    !>  ~[0]
-    !>  (search-all-by-list "ba" "ba")
-++  test-search-all-by-list-example-00
-  %+  expect-eq
-    !>  ~[1 3]
-    !>  (search-all-by-list "cbabab" "ba")
-::  +search-all-by-unit
-++  test-search-all-by-unit-00
-  %+  expect-eq
-    !>  ~[2]
-    !>  (search-all-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-search-all-by-unit-fail-00
-  %-  expect-fail
-  |.  (search-all-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-search-all-by-unit-fail-01
-  %-  expect-fail
-  |.  (search-all-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-search-all-by-unit-example-00
-  %+  expect-eq
-    !>  ~[2 4]
-    !>  (search-all-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-::  +search-back
-++  test-search-back-00
-  %+  expect-eq
-    !>  15
-    !>  (search-back (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-back-fail-00
-  %-  expect-fail
-  |.  (search-back (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-back-fail-01
-  %-  expect-fail
-  |.  (search-back (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-back-fail-02
-  %-  expect-fail
-  |.  (search-back (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-back-example-00
-  %+  expect-eq
-    !>  30
-    !>  (search-back (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::  +search-back-by-list
-++  test-search-back-by-list-00
-  %+  expect-eq
-    !>  0
-    !>  (search-back-by-list "ba" "ba")
-++  test-search-back-by-list-fail-00
-  %-  expect-fail
-  |.  (search-back-by-list "cbabab" ~)
-++  test-search-back-by-list-fail-01
-  %-  expect-fail
-  |.  (search-back-by-list ~ "ba")
-++  test-search-back-by-list-example-00
-  %+  expect-eq
-    !>  3
-    !>  (search-back-by-list "cbabab" "ba")
-::  +search-back-by-unit
-++  test-search-back-by-unit-00
-  %+  expect-eq
-    !>  2
-    !>  (search-back-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-search-back-by-unit-fail-00
-  %-  expect-fail
-  |.  (search-back-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-search-back-by-unit-fail-01
-  %-  expect-fail
-  |.  (search-back-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-search-back-by-unit-example-00
-  %+  expect-eq
-    !>  4
-    !>  (search-back-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-::  +search-index
-++  test-search-index-00
-  %+  expect-eq
-    !>  0
-    !>  (search-index (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-fail-00
-  %-  expect-fail
-  |.  (search-index (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-fail-01
-  %-  expect-fail
-  |.  (search-index (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-fail-02
-  %-  expect-fail
-  |.  (search-index (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-example-00
-  %+  expect-eq
-    !>  14
-    !>  (search-index (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::  +search-by-list
-++  test-search-by-list-00
-  %+  expect-eq
-    !>  0
-    !>  (search-by-list `(list @)`~[1] `(list @)`~[1])
-++  test-search-by-list-01
-  %+  expect-eq
-    !>  0
-    !>  (search-by-list `(list @)`~[1 2] `(list @)`~[1 2])
-++  test-search-by-list-02
-  %+  expect-eq
-    !>  3
-    !>  (search-by-list `(list @)`~[1 2 3 4 5] `(list @)`~[4 5])
-++  test-search-by-list-fail-00
-  %-  expect-fail
-  |.  (search-by-list `(list @)`~ `(list @)`~[2 3])
-++  test-search-by-list-fail-01
-  %-  expect-fail
-  |.  (search-by-list `(list @)`~[1 2 3 4 5] `(list @)`~)
-++  test-search-by-list-fail-02
-  %-  expect-fail
-  |.  (search-by-list `(list @)`~[1 2 3 4 5] `(list @)`~[4 6])
-++  test-search-by-list-example-00
-  %+  expect-eq
-    !>  2
-    !>  (search-by-list "cbabab" "ab")
-::  +search-by-unit
-++  test-search-by-unit-00
-  %+  expect-eq
-    !>  2
-    !>  (search-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-search-by-unit-fail-00
-  %-  expect-fail
-  |.  (search-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-search-by-unit-fail-01
-  %-  expect-fail
-  |.  (search-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-search-by-unit-example-00
-  %+  expect-eq
-    !>  2
-    !>  (search-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-::  +search-index-all
-++  test-search-index-all-00
-  %+  expect-eq
-    !>  ~
-    !>  (search-index-all `(list @)`~ |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-all-01
-  %+  expect-eq
-    !>  ~
-    !>  (search-index-all `(list @)`~[1] |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-all-02
-  %+  expect-eq
-    !>  ~[0]
-    !>  (search-index-all `(list @)`~[15] |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-all-example-00
-  %+  expect-eq
-    !>  ~[14 29]
-    !>  (search-index-all (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::  +search-index-back
-++  test-search-index-back-00
-  %+  expect-eq
-    !>  0
-    !>  (search-index-back (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-back-fail-00
-  %-  expect-fail
-  |.  (search-index-back (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-back-fail-01
-  %-  expect-fail
-  |.  (search-index-back (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-back-fail-02
-  %-  expect-fail
-  |.  (search-index-back (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-search-index-back-example-00
-  %+  expect-eq
-    !>  29
-    !>  (search-index-back (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+
 ::  +singleton
 ++  test-singleton-00
   %+  expect-eq
@@ -1449,7 +1513,9 @@
 ++  test-sort-by-descending-example-00
   %+  expect-eq
     !>  ~["dddd" "ccc" "bb" "a"]
-    !>  (sort-by-descending (limo ~["bb" "a" "dddd" "ccc"]) |=(a=tape (lent a)))
+    !>  %:  sort-by-descending
+            (limo ~["bb" "a" "dddd" "ccc"])  |=(a=tape (lent a))
+        ==
 ::  +sort-descending
 ++  test-sort-descending-00
   %+  expect-eq
@@ -1571,6 +1637,120 @@
   %+  expect-eq
     !>  `"tape"
     !>  (try-exactly-one (limo ~["tape"]))
+::  +try-find
+++  test-try-find-00
+  %+  expect-eq
+    !>  `15
+    !>  (try-find (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-find (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-02
+  %+  expect-eq
+    !>  ~
+    !>  (try-find (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-03
+  %+  expect-eq
+    !>  ~
+    !>  (try-find (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-example-00
+  %+  expect-eq
+    !>  `15
+    !>  (try-find (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+::  +try-find-back
+++  test-try-find-back-00
+  %+  expect-eq
+    !>  `15
+    !>  (try-find-back (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-back-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-back (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-back-02
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-back (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-back-03
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-back (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-back-example-00
+  %+  expect-eq
+    !>  `30
+    !>  %:  try-find-back
+            (gulf [1 30])
+            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+        ==
+::  +try-find-by-unit
+++  test-try-find-by-unit-00
+  %+  expect-eq
+    !>  `2
+    !>  (try-find-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-try-find-by-unit-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-try-find-by-unit-02
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-try-find-by-unit-example-00
+  %+  expect-eq
+    !>  `2
+    !>  (try-find-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+++  test-try-find-by-unit-example-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-by-unit (limo ~[1 3]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
+::  +try-find-index
+++  test-try-find-index-00
+  %+  expect-eq
+    !>  `0
+    !>  (try-find-index (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-index-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-index (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-index-02
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-index (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-index-03
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-index (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-index-example-00
+  %+  expect-eq
+    !>  `14
+    !>  %:  try-find-index
+            (gulf [1 30])
+            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+        ==
+::  +try-find-index-back
+++  test-try-find-index-back-00
+  %+  expect-eq
+    !>  `0
+    !>  (try-find-index-back (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-index-back-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-index-back (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-index-back-02
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-index-back (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-index-back-03
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-index-back (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
+++  test-try-find-index-back-example-00
+  %+  expect-eq
+    !>  `29
+    !>  %:  try-find-index-back
+            (gulf [1 30])
+            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
+        ==
 ::  +try-head
 ++  test-try-head-00
   %+  expect-eq
@@ -1683,111 +1863,6 @@
   %+  expect-eq
     !>  [~ ~[1 2]]
     !>  (try-remove-many-at `(list @)`[1 2 3 4 ~] [2 2])
-::  +try-search
-++  test-try-search-00
-  %+  expect-eq
-    !>  `15
-    !>  (try-search (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-01
-  %+  expect-eq
-    !>  ~
-    !>  (try-search (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-02
-  %+  expect-eq
-    !>  ~
-    !>  (try-search (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-03
-  %+  expect-eq
-    !>  ~
-    !>  (try-search (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-example-00
-  %+  expect-eq
-    !>  `15
-    !>  (try-search (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::  +try-search-back
-++  test-try-search-back-00
-  %+  expect-eq
-    !>  `15
-    !>  (try-search-back (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-back-01
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-back (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-back-02
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-back (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-back-03
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-back (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-back-example-00
-  %+  expect-eq
-    !>  `30
-    !>  (try-search-back (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::  +try-search-by-unit
-++  test-try-search-by-unit-00
-  %+  expect-eq
-    !>  `2
-    !>  (try-search-by-unit (limo ~[2]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-try-search-by-unit-01
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-by-unit `(list @)`~ |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-try-search-by-unit-02
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-by-unit (limo ~[1]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-try-search-by-unit-example-00
-  %+  expect-eq
-    !>  `2
-    !>  (try-search-by-unit (limo ~[1 2 3 4]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-++  test-try-search-by-unit-example-01
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-by-unit (limo ~[1 3]) |=(a=@ ?:(=((mod a 2) 0) `a ~)))
-::  +try-search-index
-++  test-try-search-index-00
-  %+  expect-eq
-    !>  `0
-    !>  (try-search-index (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-index-01
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-index (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-index-02
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-index (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-index-03
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-index (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-index-example-00
-  %+  expect-eq
-    !>  `14
-    !>  (try-search-index (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-::  +try-search-index-back
-++  test-try-search-index-back-00
-  %+  expect-eq
-    !>  `0
-    !>  (try-search-index-back (limo ~[15]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-index-back-01
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-index-back (limo ~) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-index-back-02
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-index-back (limo ~[14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-index-back-03
-  %+  expect-eq
-    !>  ~
-    !>  (try-search-index-back (gulf [1 14]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
-++  test-try-search-index-back-example-00
-  %+  expect-eq
-    !>  `29
-    !>  (try-search-index-back (gulf [1 30]) |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5)))))
 ::  +try-tail
 ++  test-try-tail-00
   %+  expect-eq
@@ -1941,5 +2016,9 @@
 ++  test-zip3-example-00
   %+  expect-eq
     !>  ~[[1 "aa" 'a'] [2 "bb" 'b']]
-    !>  (zip3 `(list @)`~[1 2] `(list tape)`~["aa" "bb"] `(list @t)`~['a' 'b'])
+    !>  %:  zip3
+            `(list @)`~[1 2]
+            `(list tape)`~["aa" "bb"]
+            `(list @t)`~['a' 'b']
+        ==
 --
