@@ -1722,9 +1722,54 @@
             (limo ~["a" "bb" "ccc" "d"]) 
             |=(a=tape (lth (lent a) 3))
         ==
-
 ::  +transpose
-
+++  test-transpose-00
+  %+  expect-eq
+    !>  ~[~["a"]]
+    !>  %-  transpose  (limo (limo ~["a"]) ~)
+++  test-transpose-fail-00
+  %-  expect-fail
+  |.  (transpose `(list (list tape))`~)
+++  test-transpose-fail-01
+  %-  expect-fail
+  |.  (transpose (limo (limo ~["a" "b"]) ~))
+++  test-transpose-fail-02
+  %-  expect-fail
+  |.  %-  transpose
+              %:  limo 
+                  (limo ~["a" "b"]) 
+                  (limo ~["aa" "bb" "cc"]) 
+                  (limo ~["aaa" "bbb" "ccc"])
+                  ~
+              ==
+++  test-transpose-fail-03
+  %-  expect-fail
+  |.  %-  transpose
+              %:  limo 
+                  (limo ~["a" "b" "c"]) 
+                  (limo ~["aa" "bb"]) 
+                  (limo ~["aaa" "bbb" "ccc"])
+                  ~
+              ==
+++  test-transpose-fail-04
+  %-  expect-fail
+  |.  %-  transpose
+              %:  limo 
+                  (limo ~["a" "b" "c"]) 
+                  (limo ~["aa" "bb" "cc"]) 
+                  (limo ~["aaa" "bbb"])
+                  ~
+              ==
+++  test-transpose-example-00
+  %+  expect-eq
+    !>  ~[~["a" "aa" "aaa"] ~["b" "bb" "bbb"] ~["c" "cc" "ccc"]]
+    !>  %-  transpose
+              %:  limo 
+                  (limo ~["a" "b" "c"]) 
+                  (limo ~["aa" "bb" "cc"]) 
+                  (limo ~["aaa" "bbb" "ccc"])
+                  ~
+              ==
 ::  +try-exactly-one
 ++  test-try-exactly-one-00
   %+  expect-eq

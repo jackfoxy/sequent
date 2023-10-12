@@ -1376,45 +1376,55 @@
   ?~  a  (flop c)  
   ?:  (b i.a)  $(a t.a, c [i.a c])
   (flop c)
-
 ::    +transpose: (list (list T)) -> (list (list T))
 ::
 ::  Returns the transpose of the given sequence of lists.
 ::    Examples
-::      > (transpose:seq (limo ~[(limo ~["a" "b" "c"]) (limo ~["aa" "bb" "cc"]) (limo ~["aaa" "bbb" "ccc"])]))
+::      > %-  transpose:seq 
+::              %:  limo 
+::                  (limo ~["a" "b" "c"]) 
+::                  (limo ~["aa" "bb" "cc"]) 
+::                  (limo ~["aaa" "bbb" "ccc"])
+::                  ~
+::              ==
+::      ~[~["a" "aa" "aaa"] ~["b" "bb" "bbb"] ~["c" "cc" "ccc"]]
 ::    Crash
 ::      'empty list'
 ::      'lists of unequal length'
 ::    Source
 ++  transpose
-  |=  a=(list (list tape))
-::  ?~  a  ~|('empty list' !!)
-  ~|  'lists of unequal length'
-  =/  aa=(list (list tape))  a
-  =/  b=(list (list tape))  ~
-  =/  bb=(list tape)  ~
-  |-
+  |*  a=(list (list))
+  ?:  =((lent a) 0)  ~|('empty list' !!)
+  ::~|  'lists of unequal length'
+  =/  aa=(list (list _?>(?=(^ ^ a) -.-.a)))  a
+  =/  b=(list (list _?>(?=(^ ^ a) -.-.a)))  ~
+  =/  bb=(list _?>(?=(^ ^ a) -.-.a))  ~
+  |-  ^-  (list (list _?>(?=(^ ^ a) -.-.a)))
+  ~&  '#######'
   ?~  a  (flop b)
-  =/  c=(list (list tape))  ~
-  =/  cc=(list tape)  ~
-    ~&  '@@@@@@@@@@@@@@@@'
+  =/  c=(list (list _?>(?=(^ ^ a) -.-.a)))  ~
   |-
-    ~&  "aa: {<aa>}"
-    ~&  "bb: {<bb>}"
-    ~&  "b:  {<b>}"
-    ~&  "c:  {<c>}"
-  ?~  aa  
+  ~&  '@@@@@@'
+  ~&  "a:  {<a>}"
+  ~&  "b:  {<b>}"
+  ~&  "bb:  {<bb>}"
+  ~&  "aa:  {<aa>}"
+  ~&  "c:  {<c>}"
+  ?~  aa
     %=  ^$
-      a   t.a
+      a   (flop c)
       b   [(flop bb) b]
       bb  ~
       aa  (flop c)
     ==
-  $(aa t.aa, bb [-.-.aa bb], c [-.+.aa c])
-
-
-::
-
+  ?~  i.aa
+    %=  ^$
+      a   (flop c)
+      b   [(flop bb) b]
+      bb  ~
+      aa  (flop c)
+    ==
+  $(aa t.aa, bb [-<.aa bb], c [->.aa c])
 ::    +try-exactly-one: (list T) -> (unit T)
 ::
 ::  Returns the only element of the list or None if it is empty or contains more
@@ -1614,10 +1624,8 @@
   =/  res=(list)  ~
   |-
   =/  x  (gen state)
-  ~&  "x: {<x>}"
   ?~  x  (flop res)
   =/  y  (need x)
-  ~&  "y: {<y>}"
   $(state -.y, res [+.y res])
 ::    +unzip: (list [T1 T2]) - [(list T1) (list T2)]
 ::
