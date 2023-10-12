@@ -257,7 +257,7 @@
 ::    Examples
 ::      > =foo |=  a=tape
 ::        ?:  ?&(=(4 (lent a)) =('a' -.a))  %.y  %.n
-::      > (exists:seq (limo ~["aaa" "able" "baker" "charlie" "dog"]) foo)
+::      > (exists (limo ~["aaa" "able" "baker" "charlie" "dog"]) foo)
 ::      %.y
 ::    Source
 ++  exists
@@ -365,7 +365,7 @@
 ::  Returns the last element for which the given function returns True. 
 ::  Crashes if no such element exists.
 ::    Examples
-::      > %:  find-back:seq
+::      > %:  find-back
 ::            (gulf [1 30])
 ::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
 ::        ==
@@ -394,7 +394,7 @@
 ::  returning the first result where function returns Some(x) for some x.
 ::  Crashes when no such element exists.
 ::    Examples
-::      >  %:  find-back-by-unit:seq
+::      >  %:  find-back-by-unit
 ::             (limo ~[1 2 3 4])
 ::             |=(a=@ ?:(=((mod a 2) 0) `a ~))
 ::          ==
@@ -444,7 +444,7 @@
 ::  Returns the index of the first element in the list that satisfies the given
 ::  predicate. Crashes if no such element exists.
 ::    Examples
-::      > %:  find-index:seq
+::      > %:  find-index
 ::            (gulf [1 30])
 ::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
 ::        ==
@@ -462,7 +462,7 @@
 ::
 ::  Returns the list of indices in the list that satisfies the given predicate.
 ::    Examples
-::      > %:  find-index-all:seq
+::      > %:  find-index-all
 ::            (gulf [1 30])
 ::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
 ::          ==
@@ -560,7 +560,7 @@
 ::          ^+  state
 ::          ?~  state  (limo ~[[n 1]])
 ::          [[n +(+.i.state)] state]
-::      > %:  fold-back:seq
+::      > %:  fold-back
 ::            (limo ~["Apple" "Pear" "Orange"])
 ::            `(list [tape @])`~ 
 ::            less-hungry
@@ -594,7 +594,7 @@
 ::    Examples
 ::      > (forall (limo ~[2 4 8]) |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
 ::      %.y
-::      > (forall:seq (limo ~[2 1 8]) |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
+::      > (forall (limo ~[2 1 8]) |=(a=@ ?:(=(0 (mod a 2)) %.y %.n)))
 ::      %.n
 ::    Source
 ++  forall
@@ -909,13 +909,7 @@
 ::      > (map-fold input 0 foo)
 ::      [~[['in' 2] ['out' 4] ['in' 6]] 5]
 ::    Source
-++  map-fold
-  |*  [a=(list) state=* c=$-([* *] [* *])]
-  =/  aa=(list)  ~
-  |-
-  ?~  a  [(flop aa) state]
-  =/  step  (c i.a state)
-  $(a t.a, aa [-.step aa], state +.step)
+++  map-fold  spin
 ::    +map-fold-back: [(list T1) state:T2 $-([T1 T2] [T3 T2])] -> [(list T3) T2]
 ::
 ::  Combines map and foldBack. Builds a new list whose elements are the results
@@ -933,7 +927,7 @@
 ::    Source
 ++  map-fold-back
   |*  [a=(list) state=* c=$-([* *] [* *])]
-  (map-fold (flop a) state c)
+  (spin (flop a) state c)
 ::    +mapi: [(list T1) mapping:$-([@ T1] T2)] -> (list T2)
 ::
 ::  Builds a new list whose elements are the results of applying the given
@@ -1087,8 +1081,6 @@
   |-
   ?~  a  +:(unzip (sort b aor))
   $(a t.a, b [[(q i) i.a] b], i +(i))
-
-
 ::    +reduce: [(list T) reduction:$-([T T] T)] -> T
 ::
 ::  Apply a function to each element of the list, threading an accumulator
@@ -1097,10 +1089,21 @@
 ::  third element and so on. Return the final result. If the input function is f
 ::  and the elements are i0...iN then computes f (... (f i0 i1) i2 ...) iN.
 ::    Examples
+::      > %+  reduce
+::            `(list tape)`~["urbit" "is" "fun"]
+::            |=([a=tape b=tape] (welp (snoc a ' ') b))
+::      "urbit is fun"
+::    Crash
+::      'empty list'
 ::    Source
-++  reduce  !!
-::
-
+++  reduce
+  |*  [a=(list) q=$-([* *] *)]
+  ?~  a  ~|('empty list' !!)
+  =/  b  `_?>(?=(^ a) i.a)`i.a
+  =/  c  t.a
+  |-  
+  ?~  c  b
+  $(b (q b i.c), c t.c)
 ::    +reduceBack: [(list T) reduction:$-([T T] T)] -> T
 ::
 ::  Applies a function to each element of the list, starting from the end,
@@ -1108,10 +1111,16 @@
 ::  function is f and the elements are i0...iN then computes 
 ::  f i0 (...(f iN-1 iN)).
 ::    Examples
+::      > %+  reduce-back
+::            `(list tape)`~["urbit" "is" "fun"]
+::            |=([a=tape b=tape] (welp (snoc a ' ') b))
+::      "fun is urbit"
+::    Crash
+::      'empty list'
 ::    Source
-++  reduce-back  !!
-::
-
+++  reduce-back
+  |*  [a=(list) q=$-([* *] *)]
+  (reduce (flop a) q)
 ::    +remove-at: [(list T) index:@] -> (list T)
 ::
 ::  Return a new list with the item at a given index removed.
@@ -1165,28 +1174,37 @@
 ::      ~[1 2 3]
 ::    Source
 ++  reverse  flop
-
-
-::    +scan: [(list T1) state:T2 folder:$-(T1 T2)] -> (list T2)
+::    +scanx: [(list T1) state:T2 folder:$-([T1 T2] T2)] -> (list T2)
 ::
-::  Applies a function to each element of the list, threading an
-::  accumulator argument through the computation. Take the second argument, and
-::  apply the function to it and the first element of the list. Then feed this
-::  result into the function along with the second element and so on. Returns
-::  the list of intermediate results and the final result.
+::  Applies a function to each element of the list and an accumulator, threading
+::  the accumulator argument through the computation. Returns the list of 
+::  intermediate results and the final result.
 ::    Examples
+::      > %:  scanx:seq
+::            `(list tape)`~["urbit" "is" "fun"]
+::            ""
+::           |=([a=tape b=tape] (welp (snoc b ' ') a))
+::        ==
+::      ~["" " urbit"  "urbit is" " urbit is fun"]
 ::    Source
-++  scan  !!
-::
-
+++  scanx
+  |*  [a=(list) state=* fun=$-([* *] *)]
+  =/  b=(list _state)  ~
+  |-  ^-  (list _?>(?=(^ a) i.a))
+  ?~  a  (flop [state b])
+  $(a t.a, b [state b], state (fun i.a state))
 ::    +scan-back: [(list T) state:T2 folder:$-(T1 T2)] -> (list T2)
 ::
 ::  Like fold-back, but returns both the intermediary and final results
 ::    Examples
 ::    Source
-++  scan-back  !!
-
-
+++  scan-back
+  |*  [a=(list) state=* fun=$-([* *] *)]
+  =/  c=(list _?>(?=(^ a) i.a))  (flop a)
+  =/  b=(list _state)  ~
+  |-  ^-  (list _?>(?=(^ a) i.a))
+  ?~  c  (flop [state b])
+  $(c t.c, b [state b], state (fun i.c state))
 ::    +singleton: value: T -> (list T)
 ::
 ::  Returns a list that contains one item only.
@@ -1211,17 +1229,24 @@
   ?~  p  ?~  q  p  ~|('out of range' !!)
   ?~  q  p
   $(p t.p, q (dec q))
-::
-
 ::    +skip-while: [(list T) predicate:$-(T ?)] -> (list T)
 ::
 ::  Bypasses elements in a list while the given predicate returns True, and then
 ::  returns the remaining elements of the list.
 ::    Examples
+::    > %:  skip-while
+::          (limo ~["a" "bbb" "cc" "d"])
+::          |=(a=tape (lth (lent a) 3))
+::      ==
+::    ~["bbb" "cc" "d"]
 ::    Source
-++  skip-while  !!
-::
-
+++  skip-while
+  |*  [a=(list) b=$-(* ?)]
+  =/  c=(list _?>(?=(^ a) i.a))  ~
+  |-  ^+  a
+  ?~  a  (flop c)  
+  ?~  c  ?:  (b i.a)  $(a t.a)  $(a t.a, c [i.a c])
+  $(a t.a, c [i.a c])
 ::    +sort-by: [(list T) projection:$-(T *)] -> (list T)
 ::
 ::  Sorts the given list using keys given by the given projection. Keys are
@@ -1274,6 +1299,8 @@
 ::
 ::  Splits a list into two lists, at the given index.
 ::    Examples
+::      > (split-at (limo ~[1 2 3 4 5]) 2)
+::      [~[1 2] ~[3 4 5]]
 ::    Source
 ++  split-at
   |*  [p=(list) i=@]
@@ -1285,8 +1312,7 @@
 ::
 ::  Splits the input list into at most count chunks.
 ::    Examples
-::      > (split-at (limo ~[1 2 3 4 5]) 2)
-::      [~[1 2] ~[3 4 5]]
+
 ::    Source
 ++  split-into  !!
 ::
@@ -1337,16 +1363,56 @@
 ::  Returns a list that contains all elements of the original list while the
 ::  given predicate returns True, and then returns no further elements.
 ::    Examples
+::      > %:  take-while
+::            (limo ~["a" "bb" "ccc" "d"]) 
+::            |=(a=tape (lth (lent a) 3))
+::        ==
+::      ~["a" "bb"]
 ::    Source
-++  take-while  !!
-::
+++  take-while
+|*  [a=(list) b=$-(* ?)]
+  =/  c=(list _?>(?=(^ a) i.a))  ~
+  |-  ^+  a
+  ?~  a  (flop c)  
+  ?:  (b i.a)  $(a t.a, c [i.a c])
+  (flop c)
 
 ::    +transpose: (list (list T)) -> (list (list T))
 ::
 ::  Returns the transpose of the given sequence of lists.
 ::    Examples
+::      > (transpose:seq (limo ~[(limo ~["a" "b" "c"]) (limo ~["aa" "bb" "cc"]) (limo ~["aaa" "bbb" "ccc"])]))
+::    Crash
+::      'empty list'
+::      'lists of unequal length'
 ::    Source
-++  transpose  !!
+++  transpose
+  |=  a=(list (list tape))
+::  ?~  a  ~|('empty list' !!)
+  ~|  'lists of unequal length'
+  =/  aa=(list (list tape))  a
+  =/  b=(list (list tape))  ~
+  =/  bb=(list tape)  ~
+  |-
+  ?~  a  (flop b)
+  =/  c=(list (list tape))  ~
+  =/  cc=(list tape)  ~
+    ~&  '@@@@@@@@@@@@@@@@'
+  |-
+    ~&  "aa: {<aa>}"
+    ~&  "bb: {<bb>}"
+    ~&  "b:  {<b>}"
+    ~&  "c:  {<c>}"
+  ?~  aa  
+    %=  ^$
+      a   t.a
+      b   [(flop bb) b]
+      bb  ~
+      aa  (flop c)
+    ==
+  $(aa t.aa, bb [-.-.aa bb], c [-.+.aa c])
+
+
 ::
 
 ::    +try-exactly-one: (list T) -> (unit T)
@@ -1379,7 +1445,7 @@
 ::  Returns the last element for which the given function returns True.
 ::  Return None if no such element exists.
 ::    Examples
-::      > %:  try-find-back:seq
+::      > %:  try-find-back
 ::            (gulf [1 30])
 ::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
 ::        ==
@@ -1411,7 +1477,7 @@
 ::  Returns the index of the first element in the list that satisfies the given
 ::  predicate. Return None if no such element exists.
 ::    Examples
-::      > %:  try-find-index:seq
+::      > %:  try-find-index
 ::            (gulf [1 30])
 ::            |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
 ::          ==
@@ -1428,7 +1494,7 @@
 ::  Returns the index of the last element in the list that satisfies the given
 ::  predicate. Return None if no such element exists.
 ::    Examples
-::    > %:  try-find-index-back:seq
+::    > %:  try-find-index-back
 ::          (gulf [1 30])
 ::          |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
 ::        ==
@@ -1534,19 +1600,25 @@
   |*  [a=(list) b=@ c=*]
   ?:  (gte b (lent a))  ~
   `(snap a b c)
-
-::
-
-::    +unfold: [state:T generator:$-(T -> (unit [T T]))] -> (list T)
+::    +unfold: [state:T1 generator:$-(T1 -> (unit [T1 T2]))] -> (list T2)
 ::
 ::  Returns a list that contains the elements generated by the given computation
 ::  The generator is repeatedly called to build the list until it returns None.
 ::  The given initial state argument is passed to the element generator.
 ::    Examples
+::      > (unfold:seq 1 |=(a=@ ?:((gth a 100) ~ `[(mul a 2) a])))
+::      ~[1 2 4 8 16 32 64]
 ::    Source
-++  unfold  !!
-::
-
+++  unfold
+  |*  [state=* gen=$-(* (unit [* *]))]
+  =/  res=(list)  ~
+  |-
+  =/  x  (gen state)
+  ~&  "x: {<x>}"
+  ?~  x  (flop res)
+  =/  y  (need x)
+  ~&  "y: {<y>}"
+  $(state -.y, res [+.y res])
 ::    +unzip: (list [T1 T2]) - [(list T1) (list T2)]
 ::
 ::  Splits a list of pairs into two lists.
@@ -1637,7 +1709,7 @@
 ::  Combines the three lists into a list of triples. The lists must have equal
 ::  lengths.
 ::    Examples
-::      > %:  zip3:seq
+::      > %:  zip3
 ::            `(list @)`~[1 2]
 ::            `(list tape)`~["aa" "bb"]
 ::            `(list @t)`~['a' 'b']

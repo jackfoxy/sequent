@@ -1137,7 +1137,7 @@
         ==
 ::  +map-fold
 ++  map-fold-foo
-  |*  [p=[@t @] state=@]
+  |=  [p=[@t @] state=@]
   ^-  [[@t @] @]
   ?:  =(-.p 'in')  [['in' (mul +.p 2)] (add state +.p)]
   [['out' (mul +.p 2)] (mul state +.p)]
@@ -1314,10 +1314,38 @@
   %+  expect-eq
     !>  ~[4 1 2 3]
     !>  (permute (limo ~[1 2 3 4]) |=(i=@ (mod +(i) 4)))
-
 ::  +reduce
+++  test-reduce-00
+  %+  expect-eq
+    !>  "urbit"
+    !>  %+  reduce
+            `(list tape)`~["urbit"]
+            |=([a=tape b=tape] (welp (snoc a ' ') b))
+++  test-reduce-fail-00
+  %-  expect-fail
+  |.  (reduce `(list tape)`~ |=([a=tape b=tape] (welp (snoc a ' ') b)))
+++  test-reduce-example-00
+  %+  expect-eq
+    !>  "urbit is fun"
+    !>  %+  reduce
+            `(list tape)`~["urbit" "is" "fun"]
+            |=([a=tape b=tape] (welp (snoc a ' ') b))
 ::  +reduce-back
-
+++  test-reduce-back-00
+  %+  expect-eq
+    !>  "urbit"
+    !>  %+  reduce-back
+            `(list tape)`~["urbit"]
+            |=([a=tape b=tape] (welp (snoc a ' ') b))
+++  test-reduce-back-fail-00
+  %-  expect-fail
+  |.  (reduce-back `(list tape)`~ |=([a=tape b=tape] (welp (snoc a ' ') b)))
+++  test-reduce-back-example-00
+  %+  expect-eq
+    !>  "fun is urbit"
+    !>  %+  reduce-back
+            `(list tape)`~["urbit" "is" "fun"]
+            |=([a=tape b=tape] (welp (snoc a ' ') b))
 ::  +remove-at
 ++  test-remove-at-00
   %+  expect-eq
@@ -1431,11 +1459,48 @@
   %+  expect-eq
     !>  ~[3 2 1]
     !>  (reverse (limo ~[1 2 3]))
-::
-::  +scan
+::  +scanx
+++  test-scanx-00
+  %+  expect-eq
+    !>  ~[""]
+    !>  (scanx `(list tape)`~ "" |=([a=tape b=tape] (welp (snoc b ' ') a)))
+++  test-scanx-01
+  %+  expect-eq
+    !>  ~["" " urbit"]
+    !>  %:  scanx
+            `(list tape)`~["urbit"]
+            ""
+            |=([a=tape b=tape] (welp (snoc b ' ') a))
+        ==
+++  test-scanx-example-00
+  %+  expect-eq
+    !>  ~["" " urbit" " urbit is" " urbit is fun"]
+    !>  %:  scanx
+            `(list tape)`~["urbit" "is" "fun"]
+            ""
+            |=([a=tape b=tape] (welp `tape`:(snoc b ' ') a))
+        ==
 ::  +scan-back
-::
-
+++  test-scan-back-00
+  %+  expect-eq
+    !>  ~[""]
+    !>  (scan-back `(list tape)`~ "" |=([a=tape b=tape] (welp (snoc b ' ') a)))
+++  test-scan-back-01
+  %+  expect-eq
+    !>  ~["" " urbit"]
+    !>  %:  scan-back
+            `(list tape)`~["urbit"]
+            ""
+            |=([a=tape b=tape] (welp (snoc b ' ') a))
+        ==
+++  test-scan-back-example-00
+  %+  expect-eq
+    !>  ~["" " fun" " fun is" " fun is urbit"]
+    !>  %:  scan-back
+            `(list tape)`~["urbit" "is" "fun"]
+            ""
+            |=([a=tape b=tape] (welp (snoc b ' ') a))
+        ==
 ::  +singleton
 ++  test-singleton-00
   %+  expect-eq
@@ -1476,10 +1541,26 @@
   %+  expect-eq
     !>  ~[3 4]
     !>  (skip-n `(list @)`[1 2 3 4 ~] 2)
-
 ::  +skip-while
-
-
+++  test-skip-while-00
+  %+  expect-eq
+    !>  ~
+    !>  (skip-while `(list tape)`~ |=(a=tape (lth (lent a) 3)))
+++  test-skip-while-01
+  %+  expect-eq
+    !>  ~
+    !>  (skip-while (limo ~["a"]) |=(a=tape (lth (lent a) 3)))
+++  test-skip-while-02
+  %+  expect-eq
+    !>  ~["bbb"]
+    !>  (skip-while (limo ~["bbb"]) |=(a=tape (lth (lent a) 3)))
+++  test-skip-while-example-00
+  %+  expect-eq
+    !>  ~["bbb" "cc" "d"]
+    !>  %:  skip-while
+            (limo ~["a" "bbb" "cc" "d"])
+            |=(a=tape (lth (lent a) 3))
+        ==
 ::  +sort-by
 ++  test-sort-by-00
   %+  expect-eq
@@ -1622,6 +1703,26 @@
     !>  (tail-end ~[1 2 3])
 ::
 ::  +take-while
+++  test-take-while-00
+  %+  expect-eq
+    !>  ~
+    !>  (take-while `(list tape)`~ |=(a=tape (lth (lent a) 3)))
+++  test-take-while-01
+  %+  expect-eq
+    !>  ~["a"]
+    !>  (take-while (limo ~["a"]) |=(a=tape (lth (lent a) 3)))
+++  test-take-while-02
+  %+  expect-eq
+    !>  ~
+    !>  (take-while (limo ~["bbb"]) |=(a=tape (lth (lent a) 3)))
+++  test-take-while-example-00
+  %+  expect-eq
+    !>  ~["a" "bb"]
+    !>  %:  take-while
+            (limo ~["a" "bb" "ccc" "d"]) 
+            |=(a=tape (lth (lent a) 3))
+        ==
+
 ::  +transpose
 
 ::  +try-exactly-one
@@ -1910,9 +2011,11 @@
   %+  expect-eq
     !>  ~
     !>  (try-update-at (limo ~[2 3 4]) 3 11)
-
 ::  +unfold
-
+++  test-unfold-example-01
+  %+  expect-eq
+    !>  ~[1 2 4 8 16 32 64]
+    !>  (unfold 1 |=(a=@ ?:((gth a 100) ~ `[(mul a 2) a])))
 ::  +unzip
 ++  test-unzip-00
   %+  expect-eq
