@@ -1376,11 +1376,12 @@
   ?~  a  (flop c)  
   ?:  (b i.a)  $(a t.a, c [i.a c])
   (flop c)
-::    +transpose: (list (list T)) -> (list (list T))
+::    +transpose: (list (list T)) -> ?([~ ~] (list (list T)))
 ::
 ::  Returns the transpose of the given sequence of lists.
+::  Returns [~ ~] when all lists of list are ~.
 ::    Examples
-::      > %-  transpose:seq 
+::      > %-  transpose
 ::              %:  limo 
 ::                  (limo ~["a" "b" "c"]) 
 ::                  (limo ~["aa" "bb" "cc"]) 
@@ -1389,27 +1390,41 @@
 ::              ==
 ::      ~[~["a" "aa" "aaa"] ~["b" "bb" "bbb"] ~["c" "cc" "ccc"]]
 ::    Crash
-::      'empty list'
 ::      'lists of unequal length'
 ::    Source
 ++  transpose
   |*  a=(list (list))
-  ?:  =((lent a) 0)  ~|('empty list' !!)
-  ::~|  'lists of unequal length'
+  =/  aa  a
+  =/  equal=?  %.y
+  ~|  'lists of unequal length'
+  |-  ^-  (list (list _?>(?=(^ ^ a) -.-.a)))
+  ?:  =(%.n equal)  !!
+  ?~  aa  (transpose-jgd a)
+  ?~  t.aa  (transpose-jgd a)
+  ?:  =((lent i.aa) (lent i.t.aa))  $(aa t.aa)  $(equal %.n)
+::    +transpose-jgd: (list (list T)) -> ?([~ ~] (list (list T)))
+::
+::  Returns the jagged transpose of the given sequence of lists.
+::  Returns [~ ~] when all lists of list are ~.
+::    Examples
+::      > %-  transpose-jgd
+::              %:  limo 
+::                  (limo ~["a" "b" "c"]) 
+::                  (limo ~["aa" "cc"]) 
+::                  (limo ~["aaa" "bbb" "ccc"])
+::                  ~
+::              ==
+::      ~[~["a" "aa" "aaa"] ~["b" "cc" "bbb"] ~["c" "ccc"]]
+::    Source
+++  transpose-jgd
+  |*  a=(list (list))
   =/  aa=(list (list _?>(?=(^ ^ a) -.-.a)))  a
   =/  b=(list (list _?>(?=(^ ^ a) -.-.a)))  ~
   =/  bb=(list _?>(?=(^ ^ a) -.-.a))  ~
   |-  ^-  (list (list _?>(?=(^ ^ a) -.-.a)))
-  ~&  '#######'
   ?~  a  (flop b)
   =/  c=(list (list _?>(?=(^ ^ a) -.-.a)))  ~
   |-
-  ~&  '@@@@@@'
-  ~&  "a:  {<a>}"
-  ~&  "b:  {<b>}"
-  ~&  "bb:  {<bb>}"
-  ~&  "aa:  {<aa>}"
-  ~&  "c:  {<c>}"
   ?~  aa
     %=  ^$
       a   (flop c)
@@ -1417,13 +1432,8 @@
       bb  ~
       aa  (flop c)
     ==
-  ?~  i.aa
-    %=  ^$
-      a   (flop c)
-      b   [(flop bb) b]
-      bb  ~
-      aa  (flop c)
-    ==
+  ?~  -.aa  $(aa t.aa)
+  ?~  ->.aa  $(aa t.aa, bb [-<.aa bb])
   $(aa t.aa, bb [-<.aa bb], c [->.aa c])
 ::    +try-exactly-one: (list T) -> (unit T)
 ::

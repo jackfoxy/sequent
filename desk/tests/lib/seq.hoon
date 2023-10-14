@@ -1725,51 +1725,223 @@
 ::  +transpose
 ++  test-transpose-00
   %+  expect-eq
+    !>  ~
+    !>  (transpose `(list (list tape))`~)
+++  test-transpose-01
+  %+  expect-eq
     !>  ~[~["a"]]
     !>  %-  transpose  (limo (limo ~["a"]) ~)
+++  test-transpose-02
+  %+  expect-eq
+    !>  ~[~["a"] ~["b"]]
+    !>  (transpose (limo (limo ~["a" "b"]) ~))
+++  test-transpose-03
+  %+  expect-eq
+    !>  ~[~["a"] ~["b"]]
+    !>  (transpose (limo (limo ~["a" "b"]) ~))
+++  test-transpose-04
+  %+  expect-eq
+    !>  ~[~["a" "aa"] ~["b" "bb"] ~["c" "cc"]]
+    !>  %-  transpose
+            %:  limo 
+                (limo ~["a" "b" "c"]) 
+                (limo ~["aa" "bb" "cc"]) 
+                ~
+            ==
+++  test-transpose-05
+  %+  expect-eq
+    !>  [~ ~]
+    !>  (transpose (limo ~[`(list tape)`~]))
+++  test-transpose-06
+  %+  expect-eq
+    !>  [~ ~]
+    !>  (transpose (limo ~[`(list tape)`~ `(list tape)`~]))
 ++  test-transpose-fail-00
   %-  expect-fail
-  |.  (transpose `(list (list tape))`~)
+  |.  %-  transpose
+          %:  limo 
+              (limo ~["a" "b"]) 
+              (limo ~["aa" "bb" "cc"]) 
+              (limo ~["aaa" "bbb" "ccc"])
+              ~
+          ==
 ++  test-transpose-fail-01
   %-  expect-fail
-  |.  (transpose (limo (limo ~["a" "b"]) ~))
+  |.  %-  transpose
+          %:  limo 
+              (limo ~["a" "b" "c"]) 
+              (limo ~["aa" "bb"]) 
+              (limo ~["aaa" "bbb" "ccc"])
+              ~
+          ==
 ++  test-transpose-fail-02
   %-  expect-fail
   |.  %-  transpose
-              %:  limo 
-                  (limo ~["a" "b"]) 
-                  (limo ~["aa" "bb" "cc"]) 
-                  (limo ~["aaa" "bbb" "ccc"])
-                  ~
-              ==
+          %:  limo 
+              (limo ~["a" "b" "c"]) 
+              (limo ~["aa" "bb" "cc"]) 
+              (limo ~["aaa" "bbb"])
+              ~
+          ==
 ++  test-transpose-fail-03
   %-  expect-fail
   |.  %-  transpose
-              %:  limo 
-                  (limo ~["a" "b" "c"]) 
-                  (limo ~["aa" "bb"]) 
-                  (limo ~["aaa" "bbb" "ccc"])
-                  ~
-              ==
+          %:  limo 
+              `(list tape)`~ 
+              (limo ~["aa" "bb" "cc"]) 
+              (limo ~["aaa" "bbb" "ccc"])
+              ~
+          ==
 ++  test-transpose-fail-04
   %-  expect-fail
   |.  %-  transpose
-              %:  limo 
-                  (limo ~["a" "b" "c"]) 
-                  (limo ~["aa" "bb" "cc"]) 
-                  (limo ~["aaa" "bbb"])
-                  ~
-              ==
+          %:  limo 
+              (limo ~["a" "b" "c"]) 
+              `(list tape)`~ 
+              (limo ~["aaa" "bbb" "ccc"])
+              ~
+          ==
+++  test-transpose-fail-05
+  %-  expect-fail
+  |.  %-  transpose
+          %:  limo 
+              (limo ~["a" "b" "c"]) 
+              (limo ~["aa" "bb" "cc"]) 
+              `(list tape)`~
+              ~
+          ==
 ++  test-transpose-example-00
   %+  expect-eq
     !>  ~[~["a" "aa" "aaa"] ~["b" "bb" "bbb"] ~["c" "cc" "ccc"]]
     !>  %-  transpose
-              %:  limo 
-                  (limo ~["a" "b" "c"]) 
-                  (limo ~["aa" "bb" "cc"]) 
-                  (limo ~["aaa" "bbb" "ccc"])
-                  ~
-              ==
+            %:  limo 
+                (limo ~["a" "b" "c"]) 
+                (limo ~["aa" "bb" "cc"]) 
+                (limo ~["aaa" "bbb" "ccc"])
+                ~
+            ==
+::  +transpose-jgd
+++  test-transpose-jgd-00
+  %+  expect-eq
+    !>  ~
+    !>  (transpose-jgd `(list (list tape))`~)
+++  test-transpose-jgd-01
+  %+  expect-eq
+    !>  ~[~["a"]]
+    !>  %-  transpose-jgd  (limo (limo ~["a"]) ~)
+++  test-transpose-jgd-02
+  %+  expect-eq
+    !>  ~[~["a"] ~["b"]]
+    !>  (transpose-jgd (limo (limo ~["a" "b"]) ~))
+++  test-transpose-jgd-03
+  %+  expect-eq
+    !>  ~[~["a"] ~["b"]]
+    !>  (transpose-jgd (limo (limo ~["a" "b"]) ~))
+++  test-transpose-jgd-04
+  %+  expect-eq
+    !>  ~[~["a" "aa"] ~["b" "bb"] ~["c" "cc"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                (limo ~["a" "b" "c"]) 
+                (limo ~["aa" "bb" "cc"]) 
+                ~
+            ==
+++  test-transpose-jgd-05
+  %+  expect-eq
+    !>  ~[~["a" "aa"] ~["b" "cc"] ~["c"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                (limo ~["a" "b" "c"]) 
+                (limo ~["aa" "cc"]) 
+                ~
+            ==
+++  test-transpose-jgd-06
+  %+  expect-eq
+    !>  ~[~["a" "aa"] ~["c" "bb"] ~["cc"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                (limo ~["a" "c"]) 
+                (limo ~["aa" "bb" "cc"]) 
+                ~
+            ==
+++  test-transpose-jgd-07
+  %+  expect-eq
+    !>  ~[~["a" "aa" "aaa"] ~["b" "bb" "bbb"] ~["cc" "ccc"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                (limo ~["a" "b"]) 
+                (limo ~["aa" "bb" "cc"]) 
+                (limo ~["aaa" "bbb" "ccc"])
+                ~
+            ==
+++  test-transpose-jgd-08
+  %+  expect-eq
+    !>  ~[~["a" "aa" "aaa"] ~["b" "bb" "bbb"] ~["cc" "ccc"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                (limo ~["a" "b" "cc"]) 
+                (limo ~["aa" "bb"]) 
+                (limo ~["aaa" "bbb" "ccc"])
+                ~
+            ==
+++  test-transpose-jgd-09
+  %+  expect-eq
+    !>  ~[~["a" "aa" "aaa"] ~["b" "bb" "bbb"] ~["c" "cc"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                (limo ~["a" "b" "c"]) 
+                (limo ~["aa" "bb" "cc"]) 
+                (limo ~["aaa" "bbb"])
+                ~
+            ==
+++  test-transpose-jgd-10
+  %+  expect-eq
+    !>  ~[~["aa" "aaa"] ~["bb" "bbb"] ~["cc" "ccc"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                `(list tape)`~ 
+                (limo ~["aa" "bb" "cc"]) 
+                (limo ~["aaa" "bbb" "ccc"])
+                ~
+            ==
+++  test-transpose-jgd-11
+  %+  expect-eq
+    !>  ~[~["a" "aaa"] ~["b" "bbb"] ~["c" "ccc"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                (limo ~["a" "b" "c"]) 
+                `(list tape)`~ 
+                (limo ~["aaa" "bbb" "ccc"])
+                ~
+            ==
+++  test-transpose-jgd-12
+  %+  expect-eq
+    !>  ~[~["a" "aa"] ~["b" "bb"] ~["c" "cc"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                (limo ~["a" "b" "c"]) 
+                (limo ~["aa" "bb" "cc"]) 
+                `(list tape)`~
+                ~
+            ==
+++  test-transpose-jgd-13
+  %+  expect-eq
+    !>  [~ ~]
+    !>  (transpose-jgd (limo ~[`(list tape)`~]))
+++  test-transpose-jgd-14
+  %+  expect-eq
+    !>  [~ ~]
+    !>  (transpose-jgd (limo ~[`(list tape)`~ `(list tape)`~]))
+++  test-transpose-jgd-example-00
+  %+  expect-eq
+    !>  ~[~["a" "aa" "aaa"] ~["b" "cc" "bbb"] ~["c" "ccc"]]
+    !>  %-  transpose-jgd
+            %:  limo 
+                (limo ~["a" "b" "c"]) 
+                (limo ~["aa" "cc"]) 
+                (limo ~["aaa" "bbb" "ccc"])
+                ~
+            ==
 ::  +try-exactly-one
 ++  test-try-exactly-one-00
   %+  expect-eq
