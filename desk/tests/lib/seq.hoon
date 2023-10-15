@@ -11,7 +11,7 @@
   %+  expect-eq
     !>  ~[["cc" 3] ["cc" 2] ["cc" 1] ["bb" 3] ["bb" 2] ["bb" 1] ["aa" 3] ["aa" 2] ["aa" 1]]
     !>  `(list [tape @ud])`(all-pairs ~["aa" "bb" "cc"] ~[1 2 3])
-++  test-all-pairs-example-00  ::  tests wetness
+++  test-all-pairs-example-00
   %+  expect-eq
     !>  ~[['c' 3] ['c' 2] ['c' 1] ['b' 3] ['b' 2] ['b' 1] ['a' 3] ['a' 2] ['a' 1]]
     !>  (all-pairs ~['a' 'b' 'c'] ~[1 2 3])
@@ -45,7 +45,7 @@
   %+  expect-eq
     !>  ~["a" "b" "C" "D"]
     !>  (append ~["a" "b"] ~["C" "D"])
-++  test-append-example-00  ::  tests wetness
+++  test-append-example-00
   %+  expect-eq
     !>  "urbit"
     !>  (append "urb" "it")
@@ -100,7 +100,7 @@
   %+  expect-eq
     !>  ~[1 2 3 4 4 3 2]
     !>  (choose ~[1 2 3 4 5 6 7 4 3 2] |=(a=@ ?:((lth a 5) `a ~)))
-++  test-choose-example-00    ::  test wetness
+++  test-choose-example-00
   %+  expect-eq
     !>  [i=12 t=[i=13 t=~]]
     !>  (choose `(list @)`[0 1 2 3 ~] |=(a=@ ?.((gte a 2) ~ (some (add a 10)))))
@@ -203,7 +203,10 @@
   %+  expect-eq
     !>  ~[1 2 3 4 5 6 7 4 3 2]
     !>  (concat ~[~[1] ~[2 3] ~[4 5 6] ~[7 4 3] ~[2]])
-::  ++  test-concat-wetness  ::  test wetness?
+++  test-concat-06
+  %+  expect-eq
+    !>  ~["aa" "bb" "cc" "dd" "ee" "ff"]
+    !>  (concat (limo ~[(limo ~["aa"]) (limo ~["bb" "cc"]) (limo ~["dd" "ee" "ff"])]))
 ++  test-concat-example-00
   %+  expect-eq
     !>  ~['a' 'b' 'c' 'e' 'f' 'g' 'h' 'i' 'j']
@@ -1654,7 +1657,44 @@
     !>  (split-at (limo ~[1 2 3 4 5]) 2)
 
 ::  +split-into
-
+++  test-split-into-00
+  %+  expect-eq
+    !>  ~
+    !>  (split-into `(list tape)`~ 4)
+++  test-split-into-01
+  %+  expect-eq
+    !>  ~[~["aa"]]
+    !>  (split-into (limo ~["aa"]) 1)
+++  test-split-into-02
+  %+  expect-eq
+    !>  ~[~["aa"]]
+    !>  (split-into (limo ~["aa"]) 3)
+++  test-split-into-03
+  %+  expect-eq
+    !>  ~[~["aa"] ~["bb"]]
+    !>  (split-into (limo ~["aa" "bb"]) 3)
+++  test-split-into-04
+  %+  expect-eq
+    !>  ~[~["aa"] ~["bb"] ~["cc"]]
+    !>  (split-into (limo ~["aa" "bb" "cc"]) 3)
+++  test-split-into-05
+  %+  expect-eq
+    !>  ~[~["aa" "bb"] ~["cc"] ~["dd"]]
+    !>  (split-into (limo ~["aa" "bb" "cc" "dd"]) 3)
+++  test-split-into-06
+  %+  expect-eq
+    !>  ~[~["aa" "bb"] ~["cc" "dd"]]
+    !>  (split-into (limo ~["aa" "bb" "cc" "dd"]) 2)
+++  test-split-into-fail-00
+  %-  expect-fail
+  |.  (split-into `(list tape)`~ 0)
+++  test-split-into-fail-01
+  %-  expect-fail
+  |.  (split-into (limo ~["aa"]) 0)
+++  test-split-into-example-00
+  %+  expect-eq
+    !>  ~[~[1 2 3] ~[4 5 6] ~[7 8] ~[9 10]]
+    !>  (split-into (gulf 1 10) 4)
 ::  +sum
 ++  test-sum-00
   %+  expect-eq

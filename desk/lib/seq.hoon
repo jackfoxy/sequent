@@ -1180,7 +1180,7 @@
 ::  the accumulator argument through the computation. Returns the list of 
 ::  intermediate results and the final result.
 ::    Examples
-::      > %:  scanx:seq
+::      > %:  scanx
 ::            `(list tape)`~["urbit" "is" "fun"]
 ::            ""
 ::           |=([a=tape b=tape] (welp (snoc b ' ') a))
@@ -1305,18 +1305,28 @@
 ++  split-at
   |*  [p=(list) i=@]
   [(scag i p) (slag i p)]
-
-::
-
 ::    +split-into: [(list T) count:@] -> (list (list T))
 ::
 ::  Splits the input list into at most count chunks.
 ::    Examples
-
+::    >  (split-into (gulf 1 10) 4)
+::    Crash
+::      'count is 0'
 ::    Source
-++  split-into  !!
-::
-
+++  split-into
+  |*  [a=(list) i=@]
+  ?~  i  ~|('count is 0' !!)
+  =/  b=(list (list _?>(?=(^ a) i.a)))  ~
+  |-
+  ?:  =(0 (lent a))  (flop b)
+  =/  q  (div (lent a) i)
+  =/  r  (mod (lent a) i)
+  =/  l  ?:  =(0 r)  q  +(q)
+  =/  c=(list _?>(?=(^ a) i.a))  ~
+  |-
+  ?~  l  ^$(b [(flop c) b], i (dec i))
+  ?~  a  ?~  c  (flop b)  (flop [(flop c) b])
+  $(c [i.a c], l (dec l), a t.a)
 ::    +sum: (list @) -> @
 ::
 ::  Returns the sum of the elements in the list.
@@ -1428,9 +1438,9 @@
   ?~  aa
     %=  ^$
       a   (flop c)
+      aa  (flop c)
       b   [(flop bb) b]
       bb  ~
-      aa  (flop c)
     ==
   ?~  -.aa  $(aa t.aa)
   ?~  ->.aa  $(aa t.aa, bb [-<.aa bb])
@@ -1626,7 +1636,7 @@
 ::  The generator is repeatedly called to build the list until it returns None.
 ::  The given initial state argument is passed to the element generator.
 ::    Examples
-::      > (unfold:seq 1 |=(a=@ ?:((gth a 100) ~ `[(mul a 2) a])))
+::      > (unfold 1 |=(a=@ ?:((gth a 100) ~ `[(mul a 2) a])))
 ::      ~[1 2 4 8 16 32 64]
 ::    Source
 ++  unfold
