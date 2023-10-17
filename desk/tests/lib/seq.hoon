@@ -811,6 +811,28 @@
             (limo ~[3 4 8])
             |=([a=@ b=@] ?:(=(0 (mod (add a b) 2)) %.y %.n))
         ==
+::  +from-map
+++  map-00  (to-map (limo ~[['aa' 1] ['bb' 2] ['cc' 3] ['dd' 4]]))
+++  test-from-map-example-01
+  %+  expect-eq
+    !>  ~[[p='bb' q=2] [p='dd' q=4] [p='cc' q=3] [p='aa' q=1]]
+    !>  (from-map map-00)
+
+
+::  +from-ordered-map
+
+
+::  +from-set
+++  test-from-set-example-01
+  %+  expect-eq
+    !>  ~["uqbar" "tlon" "urbit"]
+    !>  (from-set `(set tape)`[[n="tlon"] l=["urbit" ~ ~] r=["uqbar" ~ ~]])
+
+
+::  +from-stack
+::  +from-tree
+
+
 ::  +get-head
 ++  test-get-head-00
   %+  expect-eq
@@ -1762,6 +1784,50 @@
             (limo ~["a" "bb" "ccc" "d"]) 
             |=(a=tape (lth (lent a) 3))
         ==
+::  +to-map
+++  test-to-map-00
+  %+  expect-eq
+    !>  ~
+    !>  (to-map `(list [@t @])`~)
+++  test-to-map-01
+  %+  expect-eq
+    !>  [n=[p=[i='a' t="a"] q=1] l=~ r=~]
+    !>  (to-map (limo ~[["aa" 1]]))
+++  test-to-map-02
+  %+  expect-eq
+    !>  [n=[p=1 q=2] l=~ r=[n=[p=3 q=4] l=~ r=~]]
+    !>  (to-map (limo ~[[1 2] [3 4]]))
+++  test-to-map-example-00
+  %+  expect-eq
+    !>  [n=['dd' 4] l=[n=['cc' 3] l=[n=['aa' 1] ~ ~] ~] r=[n=['bb' 2] ~ ~]]
+    !>  (to-map (limo ~[['aa' 1] ['bb' 2] ['cc' 3] ['dd' 4]]))
+
+::  +to-ordered-map
+
+::  +to-set
+
+++  test-to-set-00
+  %+  expect-eq
+    !>  ~
+    !>  (to-set `(list @t)`~)
+++  test-to-set-01
+  %+  expect-eq
+    !>  [[n="aa"] l=["11" ~ ~] r=~]
+    !>  (to-set (limo ~["aa" "11"]))
+++  test-to-set-02
+  %+  expect-eq
+    !>  [n=2 l=[n=1 l=~ r=~] r=~]
+    !>  (to-set (limo ~[1 2]))
+++  test-to-set-example-00
+  %+  expect-eq
+    !>  [[n="tlon"] l=["urbit" ~ ~] r=["uqbar" ~ ~]]
+    !>  (to-set (limo ~["urbit" "tlon" "uqbar"]))
+
+
+::  +to-stack
+::  +to-tree
+
+
 ::  +transpose
 ++  test-transpose-00
   %+  expect-eq

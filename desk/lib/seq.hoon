@@ -631,6 +631,51 @@
   ?~  b  ~|('cant get here' !!)
   ?.  (predicate i.a i.b)  %.n
   $(a t.a, b t.b)
+::    +from-map: (map) -> (list [* *])
+::
+::  Produces the list of all key element pairs in map.
+::    Examples
+::      > =map-00 (to-map (limo ~[['aa' 1] ['bb' 2] ['cc' 3] ['dd' 4]]))
+::      > (from-map map-00)
+::      ~[[p='bb' q=2] [p='dd' q=4] [p='cc' q=3] [p='aa' q=1]]
+::    Source
+++  from-map
+  |*  a=(map)
+  ~(tap by a)
+
+::    +from-ordered-map: -> (list [* *])
+::
+::
+::    Examples
+::    Source
+++  from-ordered-map  !!
+
+::    +from-set: -> (list)
+::
+::  Produces the list of element in set
+::    Examples
+::      > (from-set `(set tap)`[[n="tlon"] l=["urbit" ~ ~] r=["uqbar" ~ ~]])
+::    Source
+++  from-set
+  |*  a=(set)
+  ~(tap in a)
+
+
+::    +from-que: -> (list)
+::
+::
+::    Examples
+::    Source
+++  from-que  !!  ::queue?
+
+::    +from-tree: -> (list)
+::
+::
+::    Examples
+::    Source
+++  from-tree  !!
+
+
 ::    +get-head: (list T) -> T
 ::
 ::  Returns the first element of the list. Crashes on empty list.
@@ -1380,12 +1425,57 @@
 ::      ~["a" "bb"]
 ::    Source
 ++  take-while
-|*  [a=(list) b=$-(* ?)]
+  |*  [a=(list) b=$-(* ?)]
   =/  c=(list _?>(?=(^ a) i.a))  ~
   |-  ^+  a
   ?~  a  (flop c)  
   ?:  (b i.a)  $(a t.a, c [i.a c])
   (flop c)
+::    +to-map: (list [* *]) ->
+::
+::  Produces a map from a list.
+::    Examples
+::      > (to-map (limo ~[['aa' 1] ['bb' 2] ['cc' 3] ['dd' 4]]))
+::      [n=[p='dd' q=4] l=[n=[p='cc' q=3] l=[n=[p='aa' q=1] l=~ r=~] r=~] 
+::                      r=[n=[p='bb' q=2] l=~ r=~]]
+::    Source
+++  to-map
+  |*  a=(list)
+  (malt a)
+
+::    +to-ordered-map: (list [* *]) ->
+::
+::  Produces an ordered map from a list.
+::    Examples
+::    Source
+++  to-ordered-map  !!
+
+::    +to-set: (list) ->
+::
+::  Produces a set from a list.
+::    Examples
+::      > (to-map (limo ~[['aa' 1] ['bb' 2] ['cc' 3] ['dd' 4]]))
+::      [n=['dd' 4] l=[n=['cc' 3] l=[n=['aa' 1] ~ ~] ~] r=[n=['bb' 2] ~ ~]]
+::    Source
+++  to-set
+  |*  a=(list)
+  (silt a)
+
+::    +to-que: (list) ->
+::
+::
+::    Examples
+::    Source
+++  to-que  !!  ::queue?
+
+::    +to-tree: 
+::
+::
+::    Examples
+::    Source
+++  to-tree  !!
+
+
 ::    +transpose: (list (list T)) -> ?([~ ~] (list (list T)))
 ::
 ::  Returns the transpose of the given sequence of lists.
