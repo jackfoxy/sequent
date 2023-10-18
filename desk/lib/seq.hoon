@@ -642,14 +642,6 @@
 ++  from-map
   |*  a=(map)
   ~(tap by a)
-
-::    +from-ordered-map: -> (list [* *])
-::
-::
-::    Examples
-::    Source
-++  from-ordered-map  !!
-
 ::    +from-set: -> (list)
 ::
 ::  Produces the list of element in set
@@ -659,23 +651,6 @@
 ++  from-set
   |*  a=(set)
   ~(tap in a)
-
-
-::    +from-que: -> (list)
-::
-::
-::    Examples
-::    Source
-++  from-que  !!  ::queue?
-
-::    +from-tree: -> (list)
-::
-::
-::    Examples
-::    Source
-++  from-tree  !!
-
-
 ::    +get-head: (list T) -> T
 ::
 ::  Returns the first element of the list. Crashes on empty list.
@@ -1442,14 +1417,6 @@
 ++  to-map
   |*  a=(list)
   (malt a)
-
-::    +to-ordered-map: (list [* *]) ->
-::
-::  Produces an ordered map from a list.
-::    Examples
-::    Source
-++  to-ordered-map  !!
-
 ::    +to-set: (list) ->
 ::
 ::  Produces a set from a list.
@@ -1460,22 +1427,6 @@
 ++  to-set
   |*  a=(list)
   (silt a)
-
-::    +to-que: (list) ->
-::
-::
-::    Examples
-::    Source
-++  to-que  !!  ::queue?
-
-::    +to-tree: 
-::
-::
-::    Examples
-::    Source
-++  to-tree  !!
-
-
 ::    +transpose: (list (list T)) -> ?([~ ~] (list (list T)))
 ::
 ::  Returns the transpose of the given sequence of lists.

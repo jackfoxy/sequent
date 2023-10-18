@@ -1,7 +1,6 @@
 ::  tests/lib/seq/hoon    :: fsharp/tests/FSharp.Core.UnitTests/FSharp.Core/Microsoft.FSharp.Collections/ArrayModule2.fs
 /+  *seq, *test
 |%
-::
 ::  +all-pairs
 ++  test-all-pairs-00
   %+  expect-eq
@@ -15,7 +14,6 @@
   %+  expect-eq
     !>  ~[['c' 3] ['c' 2] ['c' 1] ['b' 3] ['b' 2] ['b' 1] ['a' 3] ['a' 2] ['a' 1]]
     !>  (all-pairs ~['a' 'b' 'c'] ~[1 2 3])
-::
 ::  +append
 ++  test-append-00
   %+  expect-eq
@@ -53,7 +51,6 @@
   %+  expect-eq
     !>  ~[1 2 3 4]
     !>  (append (limo [1 2 ~]) (limo [3 4 ~]))
-::
 ::  +average
 ++  test-average-00
   %+  expect-eq
@@ -78,7 +75,6 @@
 ++  test-average-by-fail-00
   %-  expect-fail
   |.  (average-by (limo ~) |=([a=@ b=@] (add a b)))
-::
 ::  +choose
 ++  test-choose-00
   %+  expect-eq
@@ -104,7 +100,6 @@
   %+  expect-eq
     !>  [i=12 t=[i=13 t=~]]
     !>  (choose `(list @)`[0 1 2 3 ~] |=(a=@ ?.((gte a 2) ~ (some (add a 10)))))
-::
 ::  +chunk-by-size
 ++  test-chunk-by-size-00
   %+  expect-eq
@@ -133,7 +128,6 @@
   %+  expect-eq
     !>  [i=~[1 2] t=[i=~[3 4] t=~[~[5 6] ~[7]]]]
     !>  (chunk-by-size (limo ~[1 2 3 4 5 6 7]) 2)
-::
 ::  +collect
 ++  test-collect-00
   %+  expect-eq
@@ -151,7 +145,6 @@
   %+  expect-eq
     !>  ~[1 1 2 2 3 3]
     !>  (collect (limo ~[1 2 3]) |=(a=* (limo ~[a a])))
-::
 ::  +compare
 ++  test-compare-00
   %+  expect-eq
@@ -177,7 +170,6 @@
   %+  expect-eq
     !>  ~[%.n %.y %.n %.y]
     !>  (compare "when" "than" aor)
-::
 ::  +concat
 ++  test-concat-00
   %+  expect-eq
@@ -215,7 +207,6 @@
   %+  expect-eq
     !>  ~[1 97 2 98 3 99 4 100]
     !>  (concat (limo [(limo [1 'a' 2 'b' ~]) (limo [3 'c' 4 'd' ~]) ~]))
-::
 ::  +contains
 ++  test-contains-00
   %+  expect-eq
@@ -229,7 +220,6 @@
   %+  expect-eq
     !>  %.y
     !>  (contains `(list tape)`~["nope" "yep"] "yep")
-::
 ::  +count-by
 ++  test-count-by-00
   %+  expect-eq
@@ -246,7 +236,6 @@
             (limo ~["where" "when" "there" "then"])
             |=(a=tape (scag 2 a))
         ==
-::
 ::  +distinct
 ++  test-distinct-00
   %+  expect-eq
@@ -401,7 +390,6 @@
   %+  expect-eq
     !>  ~[1 2 3 4 4 3 2]
     !>  (filter (limo ~[1 2 3 4 5 6 7 4 3 2]) |=(a=@ (lth a 5)))
-::  ++  test-filter-wetness  ::  test wetness?
 ++  test-filter-example-00
   %+  expect-eq
     !>  [i=2 t=~[3]]
@@ -817,22 +805,11 @@
   %+  expect-eq
     !>  ~[[p='bb' q=2] [p='dd' q=4] [p='cc' q=3] [p='aa' q=1]]
     !>  (from-map map-00)
-
-
-::  +from-ordered-map
-
-
 ::  +from-set
 ++  test-from-set-example-01
   %+  expect-eq
     !>  ~["uqbar" "tlon" "urbit"]
     !>  (from-set `(set tape)`[[n="tlon"] l=["urbit" ~ ~] r=["uqbar" ~ ~]])
-
-
-::  +from-stack
-::  +from-tree
-
-
 ::  +get-head
 ++  test-get-head-00
   %+  expect-eq
@@ -857,7 +834,6 @@
   %+  expect-eq
     !>  ~[2]
     !>  (get-tail ~[1 2])
-
 ::  +group-by
 ++  test-group-by-00
   %+  expect-eq
@@ -921,7 +897,10 @@
   %+  expect-eq
     !>  ~[1 2 3]
     !>  (insert-at (limo ~[1 2]) 2 3)
-::  ++  test-insert-at-wetness  ::  test wetness?
+++  test-insert-at-06
+  %+  expect-eq
+    !>  ~["urbit" "is" "fun"]
+    !>  (insert-at (limo ~["urbit" "fun"]) 1 "is")
 ++  test-insert-at-example-00
   %+  expect-eq
     !>  [i=2 t=~[11 3 4]]
@@ -1096,7 +1075,6 @@
   %+  expect-eq
     !>  5
     !>  (length [1 'a' 2 'b' (some 10) ~])
-::
 ::  +map-seq
 ++  test-map-seq-00
   %+  expect-eq
@@ -1283,7 +1261,6 @@
   %+  expect-eq
     !>  "aa"
     !>  (min-by (limo ~["aa" "mmmm" "zzz"]) |=(a=tape (lent a)))
-
 ::  +pairwise
 ++  test-pairwise-00
   %+  expect-eq
@@ -1440,7 +1417,6 @@
   %+  expect-eq
     !>  ~[1 2]
     !>  (remove-many-at `(list @)`[1 2 3 4 ~] [2 2])
-::
 ::  +replicate
 ++  test-replicate-00
   %+  expect-eq
@@ -1466,7 +1442,6 @@
   %+  expect-eq
     !>  ~s5
     !>  `@dr`(roll (replicate 5 ~s1) add)
-::
 ::  +reverse
 ++  test-reverse-00
   %+  expect-eq
@@ -1677,7 +1652,6 @@
   %+  expect-eq
     !>  [~[1 2] ~[3 4 5]]
     !>  (split-at (limo ~[1 2 3 4 5]) 2)
-
 ::  +split-into
 ++  test-split-into-00
   %+  expect-eq
@@ -1763,7 +1737,6 @@
   %+  expect-eq
     !>  3
     !>  (tail-end ~[1 2 3])
-::
 ::  +take-while
 ++  test-take-while-00
   %+  expect-eq
@@ -1801,11 +1774,7 @@
   %+  expect-eq
     !>  [n=['dd' 4] l=[n=['cc' 3] l=[n=['aa' 1] ~ ~] ~] r=[n=['bb' 2] ~ ~]]
     !>  (to-map (limo ~[['aa' 1] ['bb' 2] ['cc' 3] ['dd' 4]]))
-
-::  +to-ordered-map
-
 ::  +to-set
-
 ++  test-to-set-00
   %+  expect-eq
     !>  ~
@@ -1822,12 +1791,6 @@
   %+  expect-eq
     !>  [[n="tlon"] l=["urbit" ~ ~] r=["uqbar" ~ ~]]
     !>  (to-set (limo ~["urbit" "tlon" "uqbar"]))
-
-
-::  +to-stack
-::  +to-tree
-
-
 ::  +transpose
 ++  test-transpose-00
   %+  expect-eq
