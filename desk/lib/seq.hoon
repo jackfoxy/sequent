@@ -1315,6 +1315,27 @@
 ++  sort-qik
   |*  a=(list)
   (sort a aor)
+
+::    +split-all: [(list T) sep:(list t)] -> (list (list T))
+::
+::  Splits a list into multiple lists, delimited by another list.
+::    Examples
+::      > (split-all "abcdefabhijkablmn" "ab")
+::      ~[~ "cdef" "hijk" "lmn"]
+::    Source
+++  split-all
+  |*  [p=(list) sep=(list)]
+  =/  c=(list (list _?>(?=(^ p) i.p)))  ~
+  =/  len  (lent sep)
+  =/  q   (flop (find-all-by-list p sep))
+  |-  ^+  c
+  ?~  p  c
+  ?~  q  $(p ~, c [p c])
+  ~|  "q:  {<q>}"
+  $(p (scag -.q p), c [(slag (add len -.q) p) c], q +.q)
+
+
+
 ::    +split-at: [(list T) index:@] -> [(list T) (list T)]
 ::
 ::  Splits a list into two lists, at the given index.

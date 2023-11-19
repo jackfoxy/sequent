@@ -1631,6 +1631,14 @@
   %+  expect-eq
     !>  ~[1 2 3 4]
     !>  (sort-qik (limo ~[4 2 1 3]))
+
+::  +split-all
+++  test-split-all-example-00
+  %+  expect-eq
+    !>  ~[~ "cdef" "hijk" "lmn"]
+    !>  (split-all "abcdefabhijkablmn" "ab")
+
+
 ::  +split-at
 ++  test-split-at-00
   %+  expect-eq
