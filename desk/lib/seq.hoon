@@ -1326,13 +1326,22 @@
 ++  split-all
   |*  [p=(list) sep=(list)]
   =/  c=(list (list _?>(?=(^ p) i.p)))  ~
+::  |=  [p=tape sep=tape]
+::  =/  c=(list tape)  ~
   =/  len  (lent sep)
-  =/  q   (flop (find-all-by-list p sep))
+  =/  q=(list @)  (flop (fand sep p))
   |-  ^+  c
+  ~&  "p:  {<p>}"
+  ~&  "c:  {<c>}"
+  ~&  "q:  {<q>}"
   ?~  p  c
   ?~  q  $(p ~, c [p c])
-  ~|  "q:  {<q>}"
-  $(p (scag -.q p), c [(slag (add len -.q) p) c], q +.q)
+::  $(p (scag i.q `tape`p), c [(slag (add len i.q) `tape`p) c], q t.q)
+  %=  $
+    c  [(slag (add len i.q) `(list _?>(?=(^ p) i.p))`p) c]
+    p  (scag i.q `(list _?>(?=(^ p) i.p))`p)
+    q  t.q
+  ==
 
 
 
