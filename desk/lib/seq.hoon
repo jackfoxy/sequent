@@ -387,7 +387,7 @@
 ::    Source
 ++  find-back-by-list
   |*  [hstk=(list) nedl=(list)]
-  (tail-end (find-all-by-list hstk nedl))
+  (tail-end (fand nedl hstk))
 ::    +find-back-by-unit: [(list T1) chooser:$-(T1 (unit T2))] -> T2
 ::
 ::  Applies the given function to successive elements from the end back, 
@@ -1548,6 +1548,19 @@
   |*  [a=(list) b=$-(* ?)]
   ?~  a  ~
   (try-find (flop a) b)
+::    +try-find-by-list: [(list T) arg:(list T)] -> (unit @)
+::
+::  Produces unit of the index of the first occurrence of the argument list
+::  sequence in the sequence of the source list or ~.
+::    Examples
+::      > (try-find-by-list "cbabab" "ab")
+::      (~ 2)
+::      > (try-find-by-list "cbabab" "ce")
+::      ~
+::    Source
+++  try-find-by-list
+  |*  [hstk=(list) nedl=(list)]
+  (find nedl hstk)
 ::    +try-find-by-unit: [(list T) chooser:$-(T (unit T))] -> (unit T)
 ::
 ::  Applies the given function to successive elements, returning Some(x) for the

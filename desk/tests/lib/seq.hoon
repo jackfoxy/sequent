@@ -1631,7 +1631,6 @@
   %+  expect-eq
     !>  ~[1 2 3 4]
     !>  (sort-qik (limo ~[4 2 1 3]))
-
 ::  +split-all
 ++  test-split-all-00
   %+  expect-eq
@@ -1661,8 +1660,6 @@
   %+  expect-eq
     !>  ~[~ "cdef" "hijk" "lmn"]
     !>  (split-all "abcdefabhijkablmn" "ab")
-
-
 ::  +split-at
 ++  test-split-at-00
   %+  expect-eq
@@ -2101,6 +2098,15 @@
             (gulf [1 30])
             |=(a=@ud ?&(=(0 (mod a 3)) =(0 (mod a 5))))
         ==
+::  +try-find-by-list
+++  test-try-find-by-list-example-00
+  %+  expect-eq
+    !>  [~ 2]
+    !>  (try-find-by-list "cbabab" "ab")
+++  test-try-find-by-list-example-01
+  %+  expect-eq
+    !>  ~
+    !>  (try-find-by-list "cbabab" "ce")
 ::  +try-find-by-unit
 ++  test-try-find-by-unit-00
   %+  expect-eq
