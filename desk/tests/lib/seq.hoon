@@ -1633,6 +1633,30 @@
     !>  (sort-qik (limo ~[4 2 1 3]))
 
 ::  +split-all
+++  test-split-all-00
+  %+  expect-eq
+    !>  ~
+    !>  (split-all ~ ~)
+++  test-split-all-01
+  %+  expect-eq
+    !>  ~
+    !>  (split-all ~ "ab")
+++  test-split-all-02
+  %+  expect-eq
+    !>  ~["a"]
+    !>  (split-all (limo ~['a']) ~)
+++  test-split-all-03
+  %+  expect-eq
+    !>  ~["a"]
+    !>  (split-all (limo ~['a']) "ab")
+++  test-split-all-04
+  %+  expect-eq
+    !>  ~[~ ~ ~ ~]
+    !>  (split-all (limo ~[97 97 97]) (limo ~['a']))
+++  test-split-all-05
+  %+  expect-eq
+    !>  ~[~ "cdef" "hijk" "lmn" ~]
+    !>  (split-all "abcdefabhijkablmnab" "ab")
 ++  test-split-all-example-00
   %+  expect-eq
     !>  ~[~ "cdef" "hijk" "lmn"]

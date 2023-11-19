@@ -1315,7 +1315,6 @@
 ++  sort-qik
   |*  a=(list)
   (sort a aor)
-
 ::    +split-all: [(list T) sep:(list t)] -> (list (list T))
 ::
 ::  Splits a list into multiple lists, delimited by another list.
@@ -1326,25 +1325,18 @@
 ++  split-all
   |*  [p=(list) sep=(list)]
   =/  c=(list (list _?>(?=(^ p) i.p)))  ~
-::  |=  [p=tape sep=tape]
-::  =/  c=(list tape)  ~
   =/  len  (lent sep)
   =/  q=(list @)  (flop (fand sep p))
   |-  ^+  c
-  ~&  "p:  {<p>}"
-  ~&  "c:  {<c>}"
-  ~&  "q:  {<q>}"
   ?~  p  c
   ?~  q  $(p ~, c [p c])
-::  $(p (scag i.q `tape`p), c [(slag (add len i.q) `tape`p) c], q t.q)
+  ?:  =(i.q 0)
+    $(c [~ [(slag (add len i.q) `(list _?>(?=(^ p) i.p))`p) c]], p ~)
   %=  $
     c  [(slag (add len i.q) `(list _?>(?=(^ p) i.p))`p) c]
     p  (scag i.q `(list _?>(?=(^ p) i.p))`p)
     q  t.q
   ==
-
-
-
 ::    +split-at: [(list T) index:@] -> [(list T) (list T)]
 ::
 ::  Splits a list into two lists, at the given index.
