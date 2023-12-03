@@ -864,10 +864,10 @@
 ::  Builds a new list whose elements are the results of applying the given
 ::  gate to each of the elements of the list.
 ::    Examples
-::      > (map (limo [104 111 111 110 ~]) @t)
+::      > (map-seq (limo [104 111 111 110 ~]) @t)
 ::      <|h o o n|>
 ::      > =a |=(a=@ (add a 4))
-::      > (map (limo [1 2 3 4 ~]) a)
+::      > (map-seq (limo [1 2 3 4 ~]) a)
 ::      ~[5 6 7 8]
 ::    Source
 ++  map-seq  turn
